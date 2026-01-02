@@ -1,8 +1,10 @@
 ---
 description: Generate and maintain comprehensive documentation from code
-argument-hint: --api or --readme
-allowed-tools: Bash(ls:*), Bash(cat:*), Bash(test:*), Bash(grep:*), Bash(find:*)
+argument-hint: --api or --readme or --check
+allowed-tools: Bash(ls:*), Bash(cat:*), Bash(test:*), Bash(grep:*), Bash(find:*), Bash(head:*), Bash(wc:*), Bash(python:*)
 ---
+
+# Expense Report Documentation
 
 Generate and maintain documentation from code, keeping it in sync with implementation.
 
@@ -62,84 +64,33 @@ Think step by step about documentation needs and:
 3. Create templates for missing documentation
 4. Ensure examples are included
 
-Generate documentation in this format:
+Generate documentation based on the flag provided:
 
-For README.md:
+### For README.md (--readme flag)
 
-```markdown
-# Project Name
+Create a comprehensive README with these sections:
 
-Brief description of what this project does.
+- Project title and description
+- Installation instructions (from package.json or requirements.txt)
+- Usage examples (from main entry points)
+- API Reference with function/class documentation
+- Parameters, return types, and examples extracted from docstrings
+- Contributing guidelines reference
+- License information
 
-## Installation
+### For API Documentation (--api flag)
 
-```bash
-# Installation commands based on package.json or requirements.txt
-```
+Create API.md with:
 
-## Usage
+- Endpoint listing (HTTP method and path)
+- Description of what each endpoint does
+- Parameters (query/path/body)
+- Response format examples in JSON
+- cURL examples for testing
 
-```python
-# Example usage based on main entry points
-```
+### For Coverage Report (--check flag)
 
-## API Reference
-
-### [Function/Class Name]
-
-[Description from docstring or inferred from code]
-
-**Parameters**:
-
-- `param_name` (type): Description
-
-**Returns**:
-
-- type: Description
-
-**Example:**
-
-```python
-# Example usage
-```
-
-## Contributing
-
-See CONTRIBUTING.md for details.
-
-## License
-
-[License information]
-
-For API documentation in markdown format:
-
-```markdown
-# API Documentation
-
-## Endpoints
-
-### GET /endpoint
-Description of what this endpoint does.
-
-**Parameters:**
-- param (query/path/body): Description
-
-**Response:**
-```json
-{
-  "field": "example"
-}
-```
-
-**Example:**
-
-```bash
-curl -X GET http://localhost:8000/endpoint
-```
-
-If --check flag is present, generate a documentation coverage report:
-
----
+Generate a formatted report showing:
 
 📄 DOCUMENTATION COVERAGE REPORT
 ───────────────────────────────
@@ -148,25 +99,26 @@ Overall Coverage: X%
 
 ✅ DOCUMENTED (X/Y)
 
-* module.py: X/Y functions
-* api.py: X/Y endpoints
+- List documented modules with function counts
+- List documented API endpoints
 
 ❌ MISSING DOCUMENTATION (X/Y)
 
-* utils.py: functionName (line X)
-* models.py: ClassName (line X)
+- List undocumented functions with file and line number
+- List undocumented classes with file and line number
 
 🔧 QUICK FIXES
 
-1. Add docstring to functionName in utils.py
-2. Document ClassName in models.py
-3. Create API documentation for /endpoint
+- Prioritized list of documentation tasks
+- Specific functions/classes that need docstrings
+- Missing API endpoint documentation
 
 🧩 TEMPLATES TO ADD
 
-* README.md sections: Usage, Examples
-* API.md: Missing endpoint documentation
-* CONTRIBUTING.md: Development setup
+- README.md sections that are missing
+- API.md if no API documentation exists
+- CONTRIBUTING.md if missing development setup
 
-If --generate flag with specific file, create documentation for that file.
-If --update flag, update existing documentation to match code changes.
+## Output Format
+
+Present all documentation in clean markdown format. Use proper headers, code blocks, and formatting. Include examples where relevant. Ensure all generated documentation is accurate and matches the actual code implementation.
