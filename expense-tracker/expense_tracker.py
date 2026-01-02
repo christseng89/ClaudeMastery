@@ -11,7 +11,26 @@ from typing import List, Dict
 
 
 class ExpenseTracker:
+    """
+    A class to manage personal expense tracking with persistent storage.
+
+    This class provides methods to add, view, and analyze expenses stored
+    in a JSON file. Each expense includes an amount, category, description,
+    and automatic timestamp.
+
+    Attributes:
+        data_file (str): Path to the JSON file storing expense data
+        expenses (List[Dict]): List of expense dictionaries loaded from file
+    """
+
     def __init__(self, data_file='expenses.json'):
+        """
+        Initialize the ExpenseTracker with a data file.
+
+        Args:
+            data_file (str): Path to JSON file for storing expenses.
+                           Defaults to 'expenses.json'
+        """
         self.data_file = data_file
         self.expenses = self.load_expenses()
 
@@ -89,6 +108,17 @@ class ExpenseTracker:
 
 
 def main():
+    """
+    Main entry point for the interactive expense tracker application.
+
+    Displays a menu-driven interface allowing users to:
+    - Add new expenses
+    - View all recorded expenses
+    - Calculate total spending with category breakdown
+    - Exit the application
+
+    The function runs in a loop until the user chooses to exit.
+    """
     tracker = ExpenseTracker()
 
     while True:

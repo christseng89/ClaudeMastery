@@ -145,12 +145,22 @@ cat << 'EOF' > .claude/commands/review-pr.md
 Print this statement - Review PR #$1 with priority $2 and assign to $3
 EOF
 
-cat << 'EOF' > .claude/commands/expense-tracker-doc.md
+```
+
+## Slash Command for Expense Tracker Report Documentation
+
+```bash
+# Use the personal command in expense-tracker project
+mkdir -p expense-tracker/.claude/commands
+
+cat << 'EOF' > expense-tracker/.claude/commands/expense-report-docs.md
 ---
 description: Generate and maintain comprehensive documentation from code
-argument-hint: --api or --readme
-allowed-tools: Bash(ls:*), Bash(cat:*), Bash(test:*), Bash(grep:*), Bash(find:*)
+argument-hint: --api or --readme or --check
+allowed-tools: Bash(ls:*), Bash(cat:*), Bash(test:*), Bash(grep:*), Bash(find:*), Bash(head:*), Bash(wc:*), Bash(python:*)
 ---
+
+# Expense Report Documentation
 
 Generate and maintain documentation from code, keeping it in sync with implementation.
 
@@ -210,50 +220,78 @@ Think step by step about documentation needs and:
 3. Create templates for missing documentation
 4. Ensure examples are included
 
-Generate documentation in this format:
+Generate documentation based on the flag provided:
 
-For README.md:
+### For README.md (--readme flag)
 
-# Project Name
+Create a comprehensive README with these sections:
 
-Brief description of what this project does.
+- Project title and description
+- Installation instructions (from package.json or requirements.txt)
+- Usage examples (from main entry points)
+- API Reference with function/class documentation
+- Parameters, return types, and examples extracted from docstrings
+- Contributing guidelines reference
+- License information
 
-## Installation
+### For API Documentation (--api flag)
 
-```bash
-# Installation commands based on package.json or requirements.txt
-```
+Create API.md with:
 
-## Usage
+- Endpoint listing (HTTP method and path)
+- Description of what each endpoint does
+- Parameters (query/path/body)
+- Response format examples in JSON
+- cURL examples for testing
 
-```python
-# Example usage based on main entry points
-```
+### For Coverage Report (--check flag)
 
-## API Reference
+Generate a formatted report showing:
 
-### [Function/Class Name]
+📄 DOCUMENTATION COVERAGE REPORT
+───────────────────────────────
 
-[Description from docstring or inferred from code]
+Overall Coverage: X%
 
-**Parameters**:
+✅ DOCUMENTED (X/Y)
 
-- `param_name` (type): Description
+- List documented modules with function counts
+- List documented API endpoints
 
-**Returns**:
+❌ MISSING DOCUMENTATION (X/Y)
 
-- type: Description
+- List undocumented functions with file and line number
+- List undocumented classes with file and line number
 
+🔧 QUICK FIXES
+
+- Prioritized list of documentation tasks
+- Specific functions/classes that need docstrings
+- Missing API endpoint documentation
+
+🧩 TEMPLATES TO ADD
+
+- README.md sections that are missing
+- API.md if no API documentation exists
+- CONTRIBUTING.md if missing development setup
+
+## Output Format
+
+Present all documentation in clean markdown format. Use proper headers, code blocks, and formatting. Include examples where relevant. Ensure all generated documentation is accurate and matches the actual code implementation.
 EOF
 
 ```
 
-#### **Parameters**
+### Run the Expense Report Documentation Command
 
-| Parameter        | Description                                                       |
-| ---------------- | ----------------------------------------------------------------- |
-| `<command-name>` | Name derived from the Markdown filename (without `.md` extension) |
-| `[arguments]`    | Optional arguments passed to the command                          |
+```cmd
+cd expense-tracker
+claude
+  /expense-report-docs --readme
+  /expense-report-docs --check
+
+/clear  
+```
 
 ## SubAgents & Skills
 

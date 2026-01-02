@@ -7,6 +7,13 @@ from expense_tracker import ExpenseTracker
 import os
 
 def test_expense_tracker():
+    """
+    Test the ExpenseTracker functionality.
+
+    Creates a temporary test file, adds sample expenses, tests viewing
+    and calculation features, verifies data persistence, and cleans up
+    test files automatically.
+    """
     # Use a test file so we don't overwrite actual data
     test_file = 'test_expenses.json'
 
