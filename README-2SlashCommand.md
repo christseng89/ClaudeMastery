@@ -236,6 +236,42 @@ claude
   /expense-report-docs --check
   /expense-report-docs --readme
 
+  /clear
+  quit
+```
+
+## Git Slash Command
+
+```bash
+cat << 'EOF' > expense-tracker/.claude/commands/expense-git.md
+---
+description: Quick git commit workflow
+allowed-tools: Bash(git:*), Bash(pytest:*)
+---
+
+# Quick Commit
+
+1. Refactor code
+2. Run tests: `pytest -v`
+3. Update Readme.md
+4. If tests pass:
+   - cd ..
+   - Show status: `git status`
+   - Stage all: `git add .`
+   - Ask for commit message
+   - Commit: `git commit -m "{message}"`
+   - Push: `git push`
+5. Done!
+EOF
+```
+
+```cmd
+claude
+  /expense-git
+  /clear
+  quit
+```
+
 ## SubAgents & Skills
 
 <https://code.claude.com/docs/en/sub-agents>
