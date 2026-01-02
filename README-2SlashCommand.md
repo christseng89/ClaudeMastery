@@ -227,6 +227,15 @@ Tests still pass
 EOF
 ```
 
+## Test the Refactor Command
+
+```cmd
+cd expense-tracker
+claude
+  /expense-refactor expense_tracker.py 
+  /expense-report-docs --check
+  /expense-report-docs --readme
+
 ## SubAgents & Skills
 
 <https://code.claude.com/docs/en/sub-agents>
