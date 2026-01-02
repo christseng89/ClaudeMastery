@@ -103,3 +103,159 @@ I want to create a simple Python expense tracker application that can:
 
 Please help me set up the project structure and create the basic files.
 ```
+
+```bash
+pyenv global 3.12.10
+pyenv local 3.12.10
+python ./expense_tracker.py
+python ./test_tracker.py
+cat ./expenses.json
+
+cd ..
+mkdir -p .claude/commands
+
+```
+
+```cmd
+claude
+  /review-pr 123 High John
+
+```
+
+## Custom Slash Command & Frontmatter
+
+### Custom Slash Commands
+
+<https://code.claude.com/docs/en/slash-commands#custom-slash-commands>
+
+#### **Syntax**
+
+```note
+/<command-name> [arguments]
+```
+
+```bash
+# Create a personal command
+mkdir -p .claude/commands
+cat << 'EOF' > .claude/commands/security-review.md
+Review this code for security vulnerabilities:
+EOF
+
+cat << 'EOF' > .claude/commands/review-pr.md
+Print this statement - Review PR #$1 with priority $2 and assign to $3
+EOF
+
+cat << 'EOF' > .claude/commands/expense-tracker-doc.md
+---
+description: Generate and maintain comprehensive documentation from code
+argument-hint: --api or --readme
+allowed-tools: Bash(ls:*), Bash(cat:*), Bash(test:*), Bash(grep:*), Bash(find:*)
+---
+
+Generate and maintain documentation from code, keeping it in sync with implementation.
+
+## Usage Examples
+
+**Basic documentation generation:**
+/expense-report-docs
+
+**Generate API documentation:**
+/expense-report-docs --api
+
+**Check documentation coverage:**
+/expense-report-docs --check
+
+**Generate README:**
+/expense-report-docs --readme
+
+**Help and options:**
+/expense-report-docs --help
+
+## Implementation
+
+If $ARGUMENTS contains "help" or "--help":
+Display this usage information and exit.
+
+Parse documentation options from $ARGUMENTS (--generate, --api, --readme, --check, or specific module/file).
+
+## 1. Analyze Current Documentation
+
+Check existing documentation:
+!find . -name "*.md" | grep -v node_modules | head -20
+!test -f README.md && echo "README exists" || echo "No README.md found"
+!find . -name "*.py" -exec grep -L '"""' {} \; | wc -l
+
+## 2. Generate Documentation
+
+Based on the arguments and project type, generate appropriate documentation.
+
+For Python projects, extract docstrings:
+!python -c "import ast; import os; [print(f'{f}: {len([n for n in ast.walk(ast.parse(open(f).read())) if isinstance(n, ast.FunctionDef) and ast.get_docstring(n)])} documented functions') for f in os.listdir('.') if f.endswith('.py')]" 2>/dev/null
+
+## 3. API Documentation
+
+If --api flag is present, analyze API endpoints:
+!grep -r -E "@(app|router)\.(get|post|put|delete|patch)" --include="*.py" 2>/dev/null | head -20
+
+## 4. Check Documentation Coverage
+
+Count undocumented functions:
+!find . -name "*.py" -exec grep -E "^def |^class " {} \; | wc -l
+!find . -name "*.py" -exec grep -A1 -E "^def |^class " {} \; | grep '"""' | wc -l
+
+Think step by step about documentation needs and:
+
+1. Identify what documentation is missing
+2. Generate appropriate documentation based on code analysis
+3. Create templates for missing documentation
+4. Ensure examples are included
+
+Generate documentation in this format:
+
+For README.md:
+
+# Project Name
+
+Brief description of what this project does.
+
+## Installation
+
+```bash
+# Installation commands based on package.json or requirements.txt
+```
+
+## Usage
+
+```python
+# Example usage based on main entry points
+```
+
+## API Reference
+
+### [Function/Class Name]
+
+[Description from docstring or inferred from code]
+
+**Parameters**:
+
+- `param_name` (type): Description
+
+**Returns**:
+
+- type: Description
+
+EOF
+
+```
+
+#### **Parameters**
+
+| Parameter        | Description                                                       |
+| ---------------- | ----------------------------------------------------------------- |
+| `<command-name>` | Name derived from the Markdown filename (without `.md` extension) |
+| `[arguments]`    | Optional arguments passed to the command                          |
+
+## SubAgents & Skills
+
+<https://code.claude.com/docs/en/sub-agents>
+<https://code.claude.com/docs/en/skills>
