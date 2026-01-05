@@ -6,7 +6,8 @@ Simple test script for Expense Tracker
 from expense_tracker import ExpenseTracker, ExpenseTrackerUI, ValidationError
 import os
 
-def test_expense_tracker():
+
+def test_expense_tracker() -> None:
     """
     Test the ExpenseTracker functionality.
 

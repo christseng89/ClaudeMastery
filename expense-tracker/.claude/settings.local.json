@@ -6,7 +6,13 @@
       "Bash(if [ -f \"README.md\" ])",
       "Bash(then echo \"README.md exists\")",
       "Bash(else echo \"No README.md found\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Skill(expense-tracker-refactor)",
+      "Skill(expense-tracker-doc)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "weather"
+  ]
 }

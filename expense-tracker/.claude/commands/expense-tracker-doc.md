@@ -11,19 +11,19 @@ Generate and maintain documentation from code, keeping it in sync with implement
 ## Usage Examples
 
 **Basic documentation generation:**
-/expense-report-docs
+/expense-tracker-doc
 
 **Generate API documentation:**
-/expense-report-docs --api
+/expense-tracker-doc --api
 
 **Check documentation coverage:**
-/expense-report-docs --check
+/expense-tracker-doc --check
 
 **Generate README:**
-/expense-report-docs --readme
+/expense-tracker-doc --readme
 
 **Help and options:**
-/expense-report-docs --help
+/expense-tracker-doc --help
 
 ## Implementation
 

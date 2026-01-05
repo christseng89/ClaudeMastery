@@ -78,7 +78,7 @@ class Expense:
             raise ValidationError("Category cannot be empty")
         return category.strip()
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, any]:
         """Convert expense to dictionary for JSON serialization."""
         return {
             'id': self.id,
@@ -89,7 +89,7 @@ class Expense:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict) -> 'Expense':
+    def from_dict(cls, data: Dict[str, any]) -> 'Expense':
         """Create an Expense object from a dictionary."""
         return cls(
             expense_id=data['id'],

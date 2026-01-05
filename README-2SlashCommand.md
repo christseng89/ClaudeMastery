@@ -1,5 +1,7 @@
 # Claude Code Slash Command
 
+<https://code.claude.com/docs/en/slash-commands>
+
 ## Custom Slash Command & Frontmatter
 
 ### Custom Slash Commands
@@ -31,7 +33,7 @@ EOF
 # Use the personal command in expense-tracker project
 mkdir -p expense-tracker/.claude/commands
 
-cat << 'EOF' > expense-tracker/.claude/commands/expense-report-docs.md
+cat << 'EOF' > expense-tracker/.claude/commands/expense-tracker-doc.md
 ---
 description: Generate and maintain comprehensive documentation from code
 argument-hint: --api or --readme or --check
@@ -45,19 +47,19 @@ Generate and maintain documentation from code, keeping it in sync with implement
 ## Usage Examples
 
 **Basic documentation generation:**
-/expense-report-docs
+/expense-tracker-doc
 
 **Generate API documentation:**
-/expense-report-docs --api
+/expense-tracker-doc --api
 
 **Check documentation coverage:**
-/expense-report-docs --check
+/expense-tracker-doc --check
 
 **Generate README:**
-/expense-report-docs --readme
+/expense-tracker-doc --readme
 
 **Help and options:**
-/expense-report-docs --help
+/expense-tracker-doc --help
 
 ## Implementation
 
@@ -165,8 +167,8 @@ EOF
 ```cmd
 cd expense-tracker
 claude
-  /expense-report-docs --readme
-  /expense-report-docs --check
+  /expense-tracker-doc --readme
+  /expense-tracker-doc --check
 
 /clear  
 quit
@@ -175,7 +177,7 @@ quit
 ## Slash Command - Refactor Expense Tracker Code
 
 ```bash
-cat << 'EOF' > expense-tracker/.claude/commands/expense-refactor.md
+cat << 'EOF' > expense-tracker/.claude/commands/expense-tracker-refactor.md
 ---
 description: Refactor Python code for better quality
 argument-hint: [file-path]
@@ -232,9 +234,9 @@ EOF
 ```cmd
 cd expense-tracker
 claude
-  /expense-refactor expense_tracker.py 
-  /expense-report-docs --check
-  /expense-report-docs --readme
+  /expense-tracker-refactor expense_tracker.py 
+  /expense-tracker-doc --check
+  /expense-tracker-doc --readme
 
   /clear
   quit
@@ -308,6 +310,47 @@ claude
     longitude: -74.006
   }
 
+```
+
+## Slash Command Workflow - Hands On
+
+<https://code.claude.com/docs/en/slash-commands#slash-command-workflow>
+
+```bash
+cat << 'EOF' > expense-tracker/.claude/commands/expense-tracker-workflow.md
+---
+description: Run complete workflow - refactor code then generate documentation
+argument-hint: [file-path]
+allowed-tools: Bash(cat:*), Bash(python:*), Bash(pytest:*), Bash(ls:*), Bash(grep:*), Bash(find:*)
+---
+
+# Full Workflow: Refactor + Documentation
+
+Execute the complete development workflow for: $ARGUMENTS
+
+If $ARGUMENTS is empty, process the entire codebase.
+
+## Workflow Steps
+
+### Phase 1: Code Refactoring
+Run the below slash command
+/expense-tracker-refactor [file] | Refactor Python code for better quality |
+
+### Phase 2: Documentation Generation
+Run the below slash commands sequentially
+/expense-tracker-doc --check | Check documentation coverage |
+/expense-tracker-doc | Generate all documentation |
+EOF
+
+cd expense-tracker
+claude
+  /expense-tracker-workflow 
+  /clear
+  quit
+
+cd ..
+claude
+  
 ```
 
 ## SubAgents & Skills
