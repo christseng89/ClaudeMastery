@@ -272,6 +272,44 @@ claude
   quit
 ```
 
+## Slash Command for MCP - Hands On
+
+<https://code.claude.com/docs/en/slash-commands#mcp-slash-commands>
+
+```bash
+cat <<'EOF' > .mcp.json
+{
+  "mcpServers": {
+    "weather": {
+      "command": "node",
+      "args": [
+        "d:\\development\\mcp-servers\\quickstart-resources\\weather-server-typescript\\build\\index.js"
+      ]
+    }
+  }
+}
+EOF
+```
+
+```bash
+claude
+
+  /mcp
+  #  1. Use this and all future MCP servers in this project 
+
+  #   Tool name: get-alerts
+  #   Full name: mcp__weather__get-alerts
+
+  
+  mcp__weather__get-alerts NY
+
+  mcp__weather__get-forecast {
+    latitude: 40.7128,
+    longitude: -74.006
+  }
+
+```
+
 ## SubAgents & Skills
 
 <https://code.claude.com/docs/en/sub-agents>
