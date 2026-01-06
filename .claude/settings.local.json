@@ -4,7 +4,8 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "mcp__weather__get-alerts",
-      "mcp__weather__get-forecast"
+      "mcp__weather__get-forecast",
+      "WebSearch"
     ]
   },
   "enableAllProjectMcpServers": true,

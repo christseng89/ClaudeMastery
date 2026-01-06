@@ -350,10 +350,7 @@ claude
 
 cd ..
 claude
-  
+/auto-commit
+/clear
+quit  
 ```
-
-## SubAgents & Skills
-
-<https://code.claude.com/docs/en/sub-agents>
-<https://code.claude.com/docs/en/skills>
