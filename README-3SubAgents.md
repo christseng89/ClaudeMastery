@@ -241,95 +241,336 @@ Source:
 
 ---
 
-## Travel Activity Planner Subagent
+## Create an Agent
 
 ```bash
-mkdir -p .claude/agents
-cat << 'EOF' > .claude/agents/travel-activity-planner.md
----
-name: travel-activity-planner
-description: Use this agent when you need to research and plan activities for a specific travel destination based on traveler preferences, interests, and demographics. Examples:
-<example>
-    <context>
-    User is planning a family trip to Tokyo with teenagers. 
-    </context>
+claude
 
-    user: "We're going to Tokyo for 5 days with our 15 and 17 year old kids who love anime, gaming, and trying new foods. Can you help us find activities?"
+  /agents
+    Create new agent
+    
+    1. Generate with Claude (recommended)
 
-    assistant: "I'll use the travel-activity-planner agent to research age-appropriate activities in Tokyo that match your family's interests in anime, gaming, and food experiences."
-
-    <commentary>
-    Since the user needs destination-specific activity planning based on traveler demographics and interests, use the travel-activity-planner agent.
-    </commentary>
-</example>
-
-<example>
-    <context>
-    User is planning a solo adventure trip to Costa Rica.
-    </context>
-    user: "I'm going to Costa Rica for a week and I love outdoor adventures, wildlife, and photography. I'm 28 and pretty active."
-    assistant: "Let me use the travel-activity-planner agent to find adventure activities and wildlife experiences in Costa Rica that would be perfect for an active solo traveler interested in photography."
-    <commentary>
-    The user needs personalized activity recommendations based on their specific interests and travel style, so the travel-activity-planner agent is appropriate.
-    </commentary>
-</example>
-
-model: sonnet
-color: purple
----
-
-You are an expert travel activity planner with extensive knowledge of global destinations and a talent for creating personalized, memorable travel experiences. You specialize in researching and curating activities that perfectly match travelers' interests, age groups, and travel styles.
-
-When planning activities, you will:
-
-**Research Process:**
-
-- Thoroughly research the destination using available search tools and recommendation engines
-- Identify activities, events, attractions, and experiences available during the travel dates
-- Cross-reference multiple sources to ensure accuracy and current availability
-- Look for both popular attractions and hidden gems that locals recommend
-- Consider seasonal factors, weather, and local events that might impact activities
-
-**Personalization Criteria:**
-
-- Carefully analyze the traveler's stated interests, hobbies, and preferences
-- Consider age-appropriate activities and energy levels
-- Factor in group dynamics (solo, couple, family, friends)
-- Account for physical abilities and any mentioned limitations
-- Balance must-see attractions with unique, personalized experiences
-
-**Activity Curation:**
-
-- Organize recommendations by day to create a logical flow
-- Include a mix of activity types (cultural, adventure, relaxation, dining, etc.)
-- Provide realistic timing and avoid over-scheduling
-- Consider proximity and transportation between activities
-- Include backup options for weather-dependent activities
-
-**For each recommended activity, provide:**
-
-- **Activity Name:** Clear, specific title
-- **Location:** Exact address or area when possible
-- **Description:** Engaging 2–3 sentence overview of what to expect
-- **Why It Fits:** Specific explanation of how it matches the traveler's interests and demographics
-- **Reviews & Ratings:** Include ratings from multiple sources (TripAdvisor, Google, Yelp, etc.) and highlight key review themes
-- **Practical Details:** Hours, pricing estimates, booking requirements, best times to visit
-
-**Quality Standards:**
-
-- Verify all information is current and accurate
-- Prioritize highly-rated activities with positive recent reviews
-- Flag any activities that might be closed, under construction, or seasonal
-- Include diverse price points unless budget constraints are specified
-- Suggest alternatives if primary recommendations are unavailable
-
-Always ask for clarification if key information is missing (travel dates, budget, group size, specific interests, or physical limitations). Your goal is to create an itinerary that feels custom-designed for each traveler's unique preferences and circumstances.
-EOF
+  /clear
+  quit
 ```
+
+```text
+You are travel activity planner agent. Your goal is to research and find cool things to do at the destination, including activities and events that match the traveler's interests and age group.
+
+You are skilled at creating personalized itineraries that cater to the specific preferences and demographics of travelers.  Research and find cool things to do at the destination.
+
+Focus on activities and events that match the traveler's interests and age group. 
+
+Utilize internet search tools and recommendation engines to gather the information.
+
+expected_output:
+
+A list of recommended activities and events for each day of the trip.
+
+Each entry should include the activity name, location, a brief description, and why it's suitable for the traveler. And potential reviews and ratings of the activities.
+```
+
+## Travel Activity Planner Subagent
 
 ```bash
 claude
 
   What are the different agents available?
 
-  travel-activity-planner I am visiting New York in the month of October with my family. I have 2 boys age 7 and 9. They like outdoor activity. Can you help me plan the trip?
+  travel-activity-planner I am visiting New York in the month of June with my family. I have 2 boys age 7 and 9. They like outdoor activity. Can you help me plan the trip?
+
+/clear
+```
+
+## Restaurants Recommendation Subagent
+
+```bash
+claude
+
+  /agents
+    Create new agent
+    1. Project (.claude/agents/) 
+    1. Generate with Claude (recommended)
+
+```
+
+```text
+You are a Restaurant Scout agent.
+
+Your goal is to find highly-rated restaurants and dining experiences at the destination, and recommend scenic locations and fun activities.
+
+As a food lover, you know the best spots in town for a delightful culinary experience.
+```
+
+```bash
+claude
+  list all available agents
+  restaurant-scout Give me the top 5 restaurants in Taipei City.
+/clear
+
+```
+
+## Run Agents in Parallel
+
+```bash
+claude
+  List all available agents
+  What are different ways to run multiple agents?
+  travel-activity-planner restaurant-scout I am visiting Taipei city with family in March. I have 2 teen agers age 15 and 18. Can you help me plan the itinerary
+
+```
+
+### Claude Response
+
+```markdown
+# Claude Response
+
+## 1. List of all agents
+
+● Complete List of Available Agents
+
+  Built-in Agents (Always Available)
+
+  1. general-purpose
+
+  - Model: Sonnet
+  - Tools: All tools (*)
+  - Purpose: Complex, multi-step tasks requiring exploration AND action
+  - Use: Automatically invoked for complex tasks that need both reading and writing
+
+  2. Explore
+
+  - Model: Haiku (fast)
+  - Tools: Read-only (Glob, Grep, Read, Bash - limited)
+  - Purpose: Fast, lightweight codebase searching and analysis
+  - Thoroughness: Quick, Medium, or Very Thorough
+  - Use: When you need to search/understand code without changes
+
+  3. Plan
+
+  - Model: Sonnet
+  - Tools: Read-only (Read, Glob, Grep, Bash)
+  - Purpose: Research and planning in plan mode
+  - Use: Automatically invoked when in plan mode for codebase research
+
+  ---
+  Your Custom Project Agents
+
+  4. travel-activity-planner
+
+  - Model: Sonnet
+  - Tools: All tools
+  - Location: .claude/agents/travel-activity-planner.md
+  - Purpose: Personalized travel activity recommendations
+  - Auto-invokes: When planning trips, asking about activities, creating itineraries
+
+  5. restaurant-scout
+
+  - Model: Sonnet
+  - Tools: All tools
+  - Location: .claude/agents/restaurant-scout.md
+  - Purpose: Restaurant recommendations and dining experiences
+  - Auto-invokes: When asking about restaurants, food, places to eat
+
+  ---
+  How to View/Manage All Agents
+
+  /agents
+
+  This interactive command lets you:
+  - View all available agents (built-in, user, project, plugin)
+  - Create new agents
+  - Edit existing agents
+  - Delete custom agents
+  - Configure tool permissions
+
+  ---
+  Agent Storage Locations
+
+  | Type     | Location                   | Scope                 |
+  |----------|----------------------------|-----------------------|
+  | Project  | .claude/agents/*.md        | Current project only  |
+  | User     | ~/.claude/agents/*.md      | All your projects     |
+  | Plugin   | Plugin's agents/ directory | When plugin installed |
+  | Built-in | Internal to Claude Code    | Always available      |
+
+  ---
+  How to Invoke Agents
+
+  Automatic (recommended):
+  > Find restaurants in Paris
+  > Plan a Tokyo itinerary
+  > Search for authentication code
+
+  Explicit:
+  > Use the restaurant-scout agent to find dining in Barcelona
+  > Use the Explore agent to search for error handling code
+
+  ---
+  Want to create a new agent? Run /agents and select "Create New Agent"!
+
+## 2. Different Ways to Run Multiple Agents
+● Here are all the different ways to run multiple agents in Claude Code:
+
+  1. Automatic Delegation (Easiest)
+
+  Claude automatically invokes the right subagent based on your request:
+  > review my code for security issues
+  > run tests and fix failures
+  Claude picks the appropriate subagent based on task description and context.
+
+  2. Explicit Invocation (Sequential)
+
+  Request specific subagents by name:
+  > Use the code-reviewer subagent to check the auth module
+  > Have the debugger subagent investigate login issues
+
+  3. Subagent Chaining (Sequential)
+
+  Chain multiple subagents for multi-step workflows:
+  > First use code-analyzer to find performance issues, then use optimizer to fix them
+
+  4. Parallel Sessions (Git Worktrees)
+
+  Run multiple independent Claude instances simultaneously:
+  git worktree add ../project-feature-a -b feature-a
+  git worktree add ../project-bugfix -b bugfix-123
+
+  # In separate terminals
+  cd ../project-feature-a && claude
+  cd ../project-bugfix && claude
+
+  5. Resumable Agents (Long-running)
+
+  Resume agents across multiple invocations with preserved context:
+  > Use code-analyzer to review the auth module
+  [Returns agentId: abc123]
+
+  > Resume agent abc123 and analyze authorization logic too
+
+  6. Built-in Specialized Subagents
+
+  - Explore - Fast codebase search (Haiku, read-only)
+  - Plan - Implementation planning (Sonnet)
+  - General-purpose - Complex multi-step tasks (Sonnet)
+
+  7. CLI Configuration (Session-specific)
+
+  claude --agents '{"code-reviewer": {"description": "...", "model": "sonnet"}}'
+
+  8. Background Bash Execution
+
+  Run processes in background while Claude continues working:
+  ! npm test &
+
+  9. Project-level Subagents
+
+  Create reusable agents in .claude/agents/:
+  /agents  # View/create/edit agents
+
+  10. Plugin-provided Subagents
+
+  Install plugins that include pre-built agents.
+
+  ---
+  Quick Comparison
+
+  | Method    | Execution  | Use Case             |
+  |-----------|------------|----------------------|
+  | Automatic | Sequential | General workflows    |
+  | Explicit  | Sequential | Specific tasks       |
+  | Chaining  | Sequential | Multi-step processes |
+  | Worktrees | Parallel   | Separate features    |
+  | Resumable | Spans time | Long analysis        |
+
+  ---
+  Your Current Setup
+
+  You have two custom agents configured:
+  - travel-activity-planner - Travel recommendations
+  - restaurant-scout - Dining suggestions
+
+  Invoke them by asking naturally:
+  > Use travel-activity-planner to suggest Tokyo activities
+
+  Or let Claude auto-delegate when appropriate!
+
+  ## 3. Itinerary for Taipei City Trip
+
+● Perfect! I've successfully run both agents in **parallel** to create your comprehensive Taipei itinerary. Here's what you now have:
+
+  🎉 Your Complete Taipei Family Trip Plan (March 2026)
+
+  📍 5-Day Activity Itinerary (from travel-activity-planner)
+
+  Highlights:
+  - Day 1: Ximending youth district + Huashan 1914 Creative Park + Shilin Night Market
+  - Day 2: Jiufen Old Street day trip (Spirited Away vibes!) + Shifen sky lanterns
+  - Day 3: Elephant Mountain hike + Taipei 101 Observatory + Maokong Gondola
+  - Day 4: National Palace Museum + Gaming culture at Syntrend + Raohe Night Market
+  - Day 5: Beitou Hot Springs + Xinyi shopping + Bubble tea challenge
+
+  Perfect for teens: Instagram-worthy locations, adventure activities, authentic culture, and plenty of food!
+
+  ---
+  🍜 Complete Dining Guide (from restaurant-scout)
+
+  Must-Try Experiences:
+  1. Night Markets: Raohe (best food), Ningxia (Michelin stalls), Shilin (most famous)
+  2. Hot Pot: Emperor Palace (unlimited Haagen-Dazs + massage chairs!)
+  3. Iconic: Din Tai Fung soup dumplings (Michelin-starred)
+  4. Bubble Tea Tour: Machi Machi, Xing Fu Tang, The Oolong Project
+  5. Traditional Breakfast: Dan Bing, Soy Milk, Fan Tuan (super cheap!)
+
+  Instagram Cafes: Coffee Lovers Planet, MoneyJump Carousel, Machi Machi
+
+  ---
+  💰 Budget Estimate (Per Person)
+
+  - Daily: NT$1,500-2,500 (USD $50-80)
+  - 5 Days Total: NT$7,500-12,500 (USD $240-400)
+  - Excludes accommodation
+
+  ---
+  🌦️ March Weather
+
+  - Temperature: 16-22°C (60-72°F)
+  - 50% chance of rain - pack light jackets and umbrellas
+  - Perfect for hot springs and creates atmospheric photos at Jiufen!
+
+  ---
+  ✨ Why This Works for Teenagers (15 & 18)
+
+  - Modern culture + authentic experiences
+  - Interactive dining (hot pot, conveyor belt sushi)
+  - Adventure activities (hiking, gondola, sky lanterns)
+  - Instagram-worthy spots everywhere
+  - Safe, independent exploration opportunities
+  - Vibrant food scene they'll love
+
+  ---
+  Both agents provided extensive details with practical tips, transportation info, cultural etiquette, and booking recommendations. You're all set for an amazing family trip to Taipei! 🎊
+
+  Would you like me to help with anything specific like booking strategies, packing lists, or day-by-day timing adjustments?     
+
+```
+
+### 中文摘要
+
+| 方法          | 執行方式 | 適用場景     |
+|---------------|----------|--------------|
+| 自動委派      | 順序執行 | 一般工作流程 |
+| 明確指定      | 順序執行 | 精準任務     |
+| 串接          | 順序執行 | 多階段流程   |
+| Worktrees     | 平行     | 多功能並行   |
+| 可恢復        | 跨時間   | 長時間分析   |
+
+## Run Agents Sequential
+
+```bash
+/clear
+
+I am visiting Taipei City in the month of March with my family. I have 2 teenagers age 15 and 18. I would like to first create a travel itinerary and then find restaurants in those areas. Please run the agent sequentially.
+
+```
