@@ -1,9 +1,43 @@
 # Expense Tracker
 
-A simple, elegant command-line expense tracker application built with Python. Track your expenses with categories, descriptions, and automatic date/time stamps, with built-in analytics to understand your spending patterns.
+A comprehensive expense tracking solution with both a command-line interface and a RESTful API. Built with Python, it provides flexible expense management with categories, descriptions, automatic timestamps, user authentication, and advanced analytics.
+
+## Table of Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [REST API](#rest-api) - For web/mobile applications
+  - [Command-Line Interface](#command-line-interface) - For local terminal use
+- [API Reference](#api-reference)
+- [Project Structure](#project-structure)
+- [Testing](#testing)
+- [Recent Improvements](#recent-improvements)
+- [Future Enhancements](#future-enhancements)
+- [Contributing](#contributing)
+
+## Which Version Should I Use?
+
+### Use the REST API if you:
+- Want to build a web or mobile frontend
+- Need multi-user support with authentication
+- Require remote access to expense data
+- Want to integrate with other applications
+- Need advanced filtering, pagination, and analytics
+
+### Use the Command-Line Interface if you:
+- Prefer working in the terminal
+- Want a simple, single-user solution
+- Don't need a web interface
+- Want zero external dependencies
+- Need quick local expense tracking
+
+Both versions can coexist and use different data stores (API uses SQLite, CLI uses JSON).
 
 ## Features
 
+### Command-Line Interface
 - **Add New Expenses**: Record expenses with amount, category, and description
 - **View All Expenses**: Display all recorded expenses in a formatted table
 - **Calculate Total Spending**: See your total spending and breakdown by category with percentages
@@ -11,10 +45,32 @@ A simple, elegant command-line expense tracker application built with Python. Tr
 - **Category Analytics**: Automatic spending breakdown by category
 - **Data Validation**: Input validation to ensure data integrity
 
+### REST API
+- **JWT Authentication**: Secure user registration and login with access and refresh tokens
+- **Full CRUD Operations**: Create, read, update, and delete expenses
+- **Advanced Filtering**: Filter expenses by category, date range, and amount
+- **Pagination & Sorting**: Efficient data retrieval with customizable page sizes and sort options
+- **Expense Analytics**: Category-based spending summaries with percentages
+- **Rate Limiting**: Protection against API abuse
+- **SQLite Database**: Persistent storage with SQLAlchemy ORM
+- **Soft Deletes**: Expense records retained for audit purposes
+- **API Documentation**: Interactive Swagger UI and ReDoc documentation
+
 ## Requirements
 
+### Command-Line Interface
 - Python 3.6 or higher
 - No external dependencies required (uses only Python standard library)
+
+### REST API
+- Python 3.8 or higher
+- FastAPI - Modern web framework for building APIs
+- SQLAlchemy - SQL toolkit and ORM
+- Pydantic - Data validation using Python type annotations
+- python-jose[cryptography] - JWT token encoding/decoding
+- passlib[bcrypt] - Password hashing
+- uvicorn - ASGI server
+- slowapi - Rate limiting for FastAPI
 
 ## Installation
 
@@ -24,7 +80,392 @@ A simple, elegant command-line expense tracker application built with Python. Tr
    cd expense-tracker
    ```
 
+### For Command-Line Interface
+No additional installation needed - just run the script directly.
+
+### For REST API
+
+1. Create a virtual environment (recommended):
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install fastapi sqlalchemy pydantic pydantic-settings python-jose[cryptography] passlib[bcrypt] uvicorn slowapi python-multipart
+   ```
+
+3. (Optional) Create a `.env` file for custom configuration:
+   ```env
+   DATABASE_URL=sqlite:///./expense_tracker.db
+   SECRET_KEY=your-secure-secret-key-here
+   ACCESS_TOKEN_EXPIRE_MINUTES=30
+   REFRESH_TOKEN_EXPIRE_DAYS=7
+   RATE_LIMIT_PER_MINUTE=60
+   ```
+
 ## Usage
+
+---
+
+## REST API
+
+### Quick Start
+
+1. Start the API server:
+   ```bash
+   python api_main.py
+   ```
+   Or using uvicorn directly:
+   ```bash
+   uvicorn api_main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+2. Access the interactive API documentation:
+   - Swagger UI: http://localhost:8000/docs
+   - ReDoc: http://localhost:8000/redoc
+
+3. Health check:
+   ```bash
+   curl http://localhost:8000/health
+   ```
+
+### Authentication Flow
+
+#### 1. Register a New User
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "username": "johndoe",
+    "password": "SecurePass123"
+  }'
+```
+
+**Response:**
+```json
+{
+  "email": "user@example.com",
+  "username": "johndoe",
+  "id": 1,
+  "is_active": true,
+  "created_at": "2026-01-08T10:30:00"
+}
+```
+
+#### 2. Login
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe",
+    "password": "SecurePass123"
+  }'
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer"
+}
+```
+
+#### 3. Get Current User Info
+
+```bash
+curl -X GET "http://localhost:8000/api/v1/auth/me" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### Expense Endpoints
+
+#### Create an Expense
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/expenses" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 45.50,
+    "category": "Food",
+    "description": "Dinner at Italian restaurant"
+  }'
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "amount": 45.50,
+  "category": "Food",
+  "description": "Dinner at Italian restaurant",
+  "date": "2026-01-08T19:30:00",
+  "created_at": "2026-01-08T19:30:00",
+  "user_id": 1
+}
+```
+
+#### List Expenses (with Pagination & Filtering)
+
+```bash
+# Basic list
+curl -X GET "http://localhost:8000/api/v1/expenses" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# With filters
+curl -X GET "http://localhost:8000/api/v1/expenses?category=Food&from_date=2026-01-01&to_date=2026-01-31&min_amount=10&max_amount=100&page=1&page_size=20&sort_by=date&sort_order=desc" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "amount": 45.50,
+      "category": "Food",
+      "description": "Dinner at Italian restaurant",
+      "date": "2026-01-08T19:30:00",
+      "created_at": "2026-01-08T19:30:00",
+      "user_id": 1
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "page_size": 20,
+  "pages": 1
+}
+```
+
+#### Get Expense Summary
+
+```bash
+# Overall summary
+curl -X GET "http://localhost:8000/api/v1/expenses/summary" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# Summary with date filter
+curl -X GET "http://localhost:8000/api/v1/expenses/summary?from_date=2026-01-01&to_date=2026-01-31" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+{
+  "total_spending": 245.75,
+  "total_expenses": 8,
+  "categories": [
+    {
+      "category": "Food",
+      "total": 125.50,
+      "percentage": 51.1,
+      "count": 4
+    },
+    {
+      "category": "Transport",
+      "total": 75.00,
+      "percentage": 30.5,
+      "count": 2
+    },
+    {
+      "category": "Entertainment",
+      "total": 45.25,
+      "percentage": 18.4,
+      "count": 2
+    }
+  ],
+  "date_range": {
+    "from": "2026-01-01",
+    "to": "2026-01-31"
+  }
+}
+```
+
+#### Get Single Expense
+
+```bash
+curl -X GET "http://localhost:8000/api/v1/expenses/1" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Update an Expense
+
+```bash
+curl -X PUT "http://localhost:8000/api/v1/expenses/1" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50.00,
+    "description": "Updated: Dinner at Italian restaurant"
+  }'
+```
+
+#### Delete an Expense
+
+```bash
+curl -X DELETE "http://localhost:8000/api/v1/expenses/1" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### API Endpoints Reference
+
+#### Authentication
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/auth/register` | Register a new user | No |
+| POST | `/api/v1/auth/login` | Login and get tokens | No |
+| GET | `/api/v1/auth/me` | Get current user info | Yes |
+
+#### Expenses
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/expenses` | Create a new expense | Yes |
+| GET | `/api/v1/expenses` | List expenses (paginated) | Yes |
+| GET | `/api/v1/expenses/summary` | Get expense summary | Yes |
+| GET | `/api/v1/expenses/{id}` | Get specific expense | Yes |
+| PUT | `/api/v1/expenses/{id}` | Update an expense | Yes |
+| DELETE | `/api/v1/expenses/{id}` | Delete an expense (soft) | Yes |
+
+#### System
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/health` | Health check | No |
+
+### Query Parameters
+
+#### List Expenses (`GET /api/v1/expenses`)
+- `page` (int): Page number (default: 1)
+- `page_size` (int): Items per page (default: 20, max: 100)
+- `category` (string): Filter by category name
+- `from_date` (string): Start date in YYYY-MM-DD format
+- `to_date` (string): End date in YYYY-MM-DD format
+- `min_amount` (float): Minimum expense amount
+- `max_amount` (float): Maximum expense amount
+- `sort_by` (string): Sort field - `date`, `amount`, or `category` (default: `date`)
+- `sort_order` (string): Sort order - `asc` or `desc` (default: `desc`)
+
+#### Get Summary (`GET /api/v1/expenses/summary`)
+- `from_date` (string): Start date in YYYY-MM-DD format
+- `to_date` (string): End date in YYYY-MM-DD format
+
+### Configuration
+
+The API can be configured using environment variables or a `.env` file:
+
+```env
+# Application
+APP_NAME=Expense Tracker API
+VERSION=1.0.0
+API_V1_PREFIX=/api/v1
+
+# Database
+DATABASE_URL=sqlite:///./expense_tracker.db
+
+# Security (CHANGE IN PRODUCTION!)
+SECRET_KEY=your-secret-key-change-this-in-production
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# Rate Limiting
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_PER_MINUTE=60
+
+# CORS
+CORS_ORIGINS=["http://localhost:3000", "http://localhost:8080"]
+
+# Pagination
+DEFAULT_PAGE_SIZE=20
+MAX_PAGE_SIZE=100
+```
+
+**Security Notes:**
+- Always change `SECRET_KEY` in production to a strong random value
+- Use environment variables for sensitive configuration
+- Enable HTTPS in production
+- Configure CORS origins appropriately for your frontend
+
+### Database
+
+The API uses SQLite by default with SQLAlchemy ORM. The database file `expense_tracker.db` is automatically created on first run.
+
+**Database Schema:**
+
+**Users Table:**
+- `id`: Integer (Primary Key)
+- `email`: String (Unique)
+- `username`: String (Unique)
+- `hashed_password`: String
+- `is_active`: Boolean
+- `created_at`: DateTime
+- `updated_at`: DateTime
+
+**Expenses Table:**
+- `id`: Integer (Primary Key)
+- `amount`: Float
+- `category`: String (Indexed)
+- `description`: String
+- `date`: DateTime (Indexed)
+- `created_at`: DateTime
+- `updated_at`: DateTime
+- `is_deleted`: Boolean (Soft delete flag)
+- `user_id`: Integer (Foreign Key to Users)
+
+### Error Handling
+
+The API returns consistent error responses:
+
+```json
+{
+  "error": {
+    "code": 400,
+    "message": "Email already registered",
+    "path": "/api/v1/auth/register"
+  }
+}
+```
+
+**Common HTTP Status Codes:**
+- `200 OK`: Successful request
+- `201 Created`: Resource created successfully
+- `204 No Content`: Successful deletion
+- `400 Bad Request`: Invalid input data
+- `401 Unauthorized`: Authentication required or failed
+- `403 Forbidden`: Insufficient permissions
+- `404 Not Found`: Resource not found
+- `422 Unprocessable Entity`: Validation error
+- `429 Too Many Requests`: Rate limit exceeded
+- `500 Internal Server Error`: Server error
+
+### Rate Limiting
+
+The API implements rate limiting to prevent abuse:
+- Default: 60 requests per minute per IP address
+- Registration endpoint: 5 requests per minute
+- Can be configured via `RATE_LIMIT_PER_MINUTE` environment variable
+
+When rate limit is exceeded, you'll receive a `429 Too Many Requests` response.
+
+### Testing the API
+
+A test suite is included for API endpoints:
+
+```bash
+pytest test_api.py -v
+```
+
+Or test manually using the interactive documentation at `/docs`.
+
+---
+
+## Command-Line Interface
 
 ### Interactive Mode
 
@@ -515,14 +956,36 @@ All tests passed successfully!
 
 ```
 expense-tracker/
-├── expense_tracker.py       # Main application (370 lines)
+├── expense_tracker.py       # CLI application (370 lines)
 │   ├── Expense              # Expense entity with validation
 │   ├── ExpenseTracker       # Core business logic
 │   ├── ExpenseTrackerUI     # User interface layer
 │   ├── CategorySummary      # Data class for analytics
 │   └── ValidationError      # Custom exception
-├── test_tracker.py          # Comprehensive test suite (110 lines)
-├── expenses.json            # Data storage (auto-created)
+├── api_main.py              # FastAPI application (550 lines)
+│   └── REST API endpoints and error handlers
+├── models.py                # SQLAlchemy database models
+│   ├── User                 # User model with authentication
+│   └── Expense              # Expense model with relationships
+├── schemas.py               # Pydantic validation schemas
+│   ├── UserCreate, UserResponse, UserLogin
+│   ├── Token, TokenData
+│   ├── ExpenseCreate, ExpenseUpdate, ExpenseResponse
+│   └── ExpenseSummary, CategorySummary
+├── auth.py                  # Authentication utilities
+│   ├── Password hashing (bcrypt)
+│   ├── JWT token management
+│   └── User authentication dependencies
+├── database.py              # Database configuration
+│   └── SQLAlchemy setup and session management
+├── config.py                # Application configuration
+│   └── Settings with environment variable support
+├── test_tracker.py          # CLI test suite
+├── test_api.py              # API test suite
+├── expenses.json            # CLI data storage (auto-created)
+├── expense_tracker.db       # API SQLite database (auto-created)
+├── requirements.txt         # Python dependencies
+├── .env                     # Environment variables (optional)
 ├── README.md                # This documentation
 ├── CONTRIBUTING.md          # Contribution guidelines
 ├── CHANGELOG.md             # Version history
@@ -536,13 +999,29 @@ expense-tracker/
 
 ### Code Organization
 
-**expense_tracker.py** structure:
+**expense_tracker.py** (CLI) structure:
 - **Lines 1-18**: Imports and constants
 - **Lines 21-31**: Supporting classes (CategorySummary, ValidationError)
 - **Lines 34-100**: Expense class (data model)
 - **Lines 103-231**: ExpenseTracker class (business logic)
 - **Lines 234-356**: ExpenseTrackerUI class (presentation)
 - **Lines 358-370**: Main entry point
+
+**api_main.py** (REST API) structure:
+- **Lines 1-28**: Imports and dependencies
+- **Lines 30-60**: Application setup (FastAPI, CORS, rate limiting)
+- **Lines 62-74**: Health check endpoint
+- **Lines 76-175**: Authentication endpoints (register, login, get user)
+- **Lines 177-503**: Expense endpoints (CRUD operations)
+- **Lines 505-537**: Error handlers
+- **Lines 539-551**: Main entry point
+
+**Other modules:**
+- **models.py**: SQLAlchemy database models (User, Expense)
+- **schemas.py**: Pydantic request/response schemas
+- **auth.py**: JWT authentication and password hashing
+- **database.py**: Database configuration and session management
+- **config.py**: Application settings and environment variables
 
 ## Error Handling
 
@@ -575,6 +1054,21 @@ The application includes comprehensive validation and error handling:
 
 ## Recent Improvements
 
+**Version 3.0 - REST API (January 2026)**
+
+Added a comprehensive REST API for web and mobile applications:
+
+- ✅ **FastAPI Framework**: Modern, fast web framework with automatic API documentation
+- ✅ **JWT Authentication**: Secure user authentication with access and refresh tokens
+- ✅ **SQLAlchemy ORM**: Database abstraction with SQLite backend
+- ✅ **Advanced Filtering**: Multi-criteria expense filtering and sorting
+- ✅ **Pagination**: Efficient data retrieval with customizable page sizes
+- ✅ **Analytics API**: Category-based spending summaries with percentages
+- ✅ **Rate Limiting**: Protection against API abuse
+- ✅ **Soft Deletes**: Audit trail for deleted expenses
+- ✅ **Error Handling**: Consistent error response format
+- ✅ **Interactive Docs**: Auto-generated Swagger UI and ReDoc documentation
+
 **Version 2.0 - Major Refactoring (January 2026)**
 
 The codebase underwent a significant refactoring to improve code quality:
@@ -594,21 +1088,30 @@ The codebase underwent a significant refactoring to improve code quality:
 - Better error handling
 - Clearer separation of responsibilities
 - Can be used programmatically without UI
+- Multi-platform support via REST API
 
 ## Future Enhancements
 
 Potential features for future versions:
 
-- Delete or edit existing expenses
-- Filter expenses by date range or category
-- Search functionality for descriptions
+**Command-Line Interface:**
 - Export reports to CSV or PDF
+- Data visualization (charts and graphs) in terminal
+
+**REST API:**
 - Budget tracking and alerts
 - Monthly/yearly spending summaries
 - Multi-currency support
 - Recurring expense tracking
-- Data visualization (charts and graphs)
-- REST API wrapper for web/mobile apps
+- Data export endpoints (CSV, PDF)
+- Expense attachments (receipts)
+- Expense tags and notes
+- Expense categories management
+- User profile management
+- Email notifications
+- Two-factor authentication
+- OAuth2 social login
+- WebSocket support for real-time updates
 
 ## Contributing
 
