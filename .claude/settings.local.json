@@ -5,7 +5,18 @@
       "Bash(git commit:*)",
       "mcp__weather__get-alerts",
       "mcp__weather__get-forecast",
-      "WebSearch"
+      "WebSearch",
+      "Bash(python:*)",
+      "Bash(dir:*)",
+      "Bash(venvScriptspython.exe -m pip install --upgrade pip)",
+      "Bash(venv/Scripts/python.exe -m pip:*)",
+      "Bash(venv/Scripts/pip.exe install:*)",
+      "Bash(venv/Scripts/pip.exe list:*)",
+      "Bash(findstr:*)",
+      "Bash(venv/Scripts/pip.exe show:*)",
+      "Bash(venv/Scripts/python.exe -m pytest test_api.py -v)",
+      "Bash(venv/Scripts/python.exe:*)",
+      "Bash(venv/Scripts/pip.exe:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

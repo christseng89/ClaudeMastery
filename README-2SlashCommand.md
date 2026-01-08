@@ -354,3 +354,7 @@ claude
 /clear
 quit  
 ```
+
+## RESOURCES
+
+<https://github.com/firstlink/claude-code/tree/main/slash-commands-and-agents/.claude/commands>

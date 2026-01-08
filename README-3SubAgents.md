@@ -574,3 +574,7 @@ claude
 I am visiting Taipei City in the month of March with my family. I have 2 teenagers age 15 and 18. I would like to first create a travel itinerary and then find restaurants in those areas. Please run the agent sequentially.
 
 ```
+
+## RESOURCES
+
+<https://github.com/firstlink/claude-code/tree/main/subagents-general-purpose/agents>
