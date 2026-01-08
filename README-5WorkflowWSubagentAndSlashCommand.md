@@ -138,6 +138,10 @@ The api-review-and-commit-workflow Slash Command is not working after commit, bo
 * **平行研究**：你主線在改 code，同時讓 subagent 去查資料。
 * **主對話快到 token 極限**：把研究丟出去，主線保持乾淨。
 
+/test
+/deploy
+/format
+
 ---
 
 ## 6 最實用的建議（官方風格總結）
