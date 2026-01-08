@@ -21,11 +21,16 @@ A modern, secure RESTful API for tracking personal expenses built with FastAPI, 
 - 📝 **Automatic API Documentation** - Swagger UI and ReDoc
 
 ### Security
-- 🔐 **JWT Token Authentication**
+- 🔐 **JWT Token Authentication** with access and refresh token validation
 - 🔒 **Password Hashing** with bcrypt
 - 🚫 **User Isolation** - Users can only access their own data
 - ⚡ **Input Validation** - Pydantic schemas for request validation
 - 🛑 **Rate Limiting** - Configurable request limits
+- 🔒 **Enforced SECRET_KEY Validation** - Production-ready security
+- 🛡️ **SQL Injection Protection** - Explicit field mapping
+- ⏱️ **Timing Attack Prevention** - Constant-time authentication
+- 🔐 **Token Type Validation** - Prevents token misuse
+- 🔒 **HTTPS Enforcement** - Production security middleware
 
 ## 📋 API Endpoints
 
@@ -111,7 +116,9 @@ These provide interactive API documentation where you can test endpoints directl
 
 ## 🔧 Configuration
 
-Create a `.env` file in the project root:
+### Environment Variables
+
+The API uses environment-based configuration for flexibility and security. Create a `.env` file in the project root:
 
 ```env
 # Application
@@ -122,11 +129,14 @@ API_V1_PREFIX=/api/v1
 # Database
 DATABASE_URL=sqlite:///./expense_tracker.db
 
-# Security (CHANGE THESE IN PRODUCTION!)
-SECRET_KEY=your-super-secret-key-change-this
+# Security
+# CRITICAL: In production, SECRET_KEY MUST be at least 32 characters
+# Generate a secure key with: python -c "import secrets; print(secrets.token_urlsafe(32))"
+SECRET_KEY=your-generated-secret-key-at-least-32-characters-long
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
+ENVIRONMENT=development  # Options: development, production
 
 # Rate Limiting
 RATE_LIMIT_ENABLED=true
@@ -138,6 +148,29 @@ CORS_ORIGINS=http://localhost:3000,http://localhost:8080
 # Pagination
 DEFAULT_PAGE_SIZE=20
 MAX_PAGE_SIZE=100
+```
+
+### Security Configuration Notes
+
+**SECRET_KEY Requirements:**
+- **Development/Testing**: A secure random key is auto-generated if not provided
+- **Production**: MUST be explicitly set and at least 32 characters
+- **Generation**: Use `python -c "import secrets; print(secrets.token_urlsafe(32))"` to generate a secure key
+- **Validation**: Weak or default keys are rejected in production mode
+
+**ENVIRONMENT Variable:**
+- Set to `production` to enable strict security validation
+- Set to `development` (default) for local testing with relaxed requirements
+- Production mode enforces:
+  - Mandatory SECRET_KEY configuration
+  - Minimum 32-character SECRET_KEY length
+  - Rejection of common weak keys
+  - HTTPS enforcement via middleware
+
+**Example SECRET_KEY Generation:**
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+# Output: xK8dJ9_vLmNpQ2rSt4uVwXyZ0123456789AbCdEfGhIjK
 ```
 
 ## 📝 Usage Examples
@@ -336,18 +369,50 @@ expense-tracker/
 
 ## 🔒 Security Best Practices
 
-1. **Change the SECRET_KEY** in production
-   ```python
-   # Generate a secure secret key:
-   import secrets
-   print(secrets.token_urlsafe(32))
-   ```
+### Recent Security Enhancements (January 2026)
 
-2. **Use HTTPS** in production
-3. **Set secure CORS origins** - don't use wildcards
-4. **Implement proper rate limiting** for your use case
-5. **Regular security updates** - keep dependencies updated
-6. **Use environment variables** - never commit secrets
+The API has been hardened with the following critical security fixes:
+
+1. **✅ SECRET_KEY Validation**
+   - Production environments now require a minimum 32-character SECRET_KEY
+   - Common weak keys are rejected automatically
+   - Development mode auto-generates secure keys for testing
+
+2. **✅ SQL Injection Prevention**
+   - Explicit field mapping replaces dynamic attribute access
+   - Sort parameters are validated against a whitelist
+   - Prevents malicious field access through query parameters
+
+3. **✅ Timing Attack Protection**
+   - Constant-time authentication prevents username enumeration
+   - Password verification always takes the same time regardless of user existence
+   - Mitigates timing-based security reconnaissance
+
+4. **✅ Token Type Validation**
+   - Access and refresh tokens are strictly validated by type
+   - Prevents refresh tokens from being used as access tokens
+   - Enhanced JWT security with type enforcement
+
+5. **✅ HTTPS Enforcement**
+   - Production mode automatically redirects HTTP to HTTPS
+   - Prevents token interception over insecure connections
+   - Middleware-based enforcement for all routes
+
+### Production Security Checklist
+
+1. **Set ENVIRONMENT=production** in your `.env` file
+2. **Generate and set a strong SECRET_KEY** (minimum 32 characters)
+   ```bash
+   python -c "import secrets; print(secrets.token_urlsafe(32))"
+   ```
+3. **Use HTTPS** - The API will automatically enforce this in production mode
+4. **Set secure CORS origins** - Never use wildcards (`*`) in production
+5. **Configure appropriate rate limiting** for your traffic patterns
+6. **Regular security updates** - Keep dependencies updated
+7. **Use environment variables** - Never commit secrets to version control
+8. **Database security** - Use PostgreSQL with SSL in production
+9. **Monitor and log** - Implement comprehensive audit logging
+10. **Regular backups** - Implement automated backup strategies
 
 ## 📊 Query Parameters Reference
 

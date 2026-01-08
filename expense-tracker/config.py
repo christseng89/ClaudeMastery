@@ -2,8 +2,9 @@
 Configuration settings for the Expense Tracker API.
 """
 from pydantic_settings import BaseSettings
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from typing import Optional
+import secrets
 
 
 class Settings(BaseSettings):
@@ -18,7 +19,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./expense_tracker.db"
 
     # Security
-    SECRET_KEY: str
+    # Default secure key for development/testing - will be validated based on ENVIRONMENT
+    SECRET_KEY: str = secrets.token_urlsafe(32)
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -35,26 +37,28 @@ class Settings(BaseSettings):
     DEFAULT_PAGE_SIZE: int = 20
     MAX_PAGE_SIZE: int = 100
 
-    @field_validator('SECRET_KEY')
-    @classmethod
-    def validate_secret_key(cls, v: str) -> str:
-        """Validate SECRET_KEY is secure."""
-        if not v or len(v) < 32:
-            raise ValueError(
-                'SECRET_KEY must be set and at least 32 characters. '
-                'Generate one with: python -c "import secrets; print(secrets.token_urlsafe(32))"'
-            )
-        # Check for common weak values
-        weak_keys = [
-            'your-secret-key-change-this-in-production',
-            'change-this',
-            'secret',
-            'password',
-            'admin'
-        ]
-        if v.lower() in weak_keys:
-            raise ValueError('SECRET_KEY must not be a default/example value')
-        return v
+    @model_validator(mode='after')
+    def validate_production_secret_key(self) -> 'Settings':
+        """Validate SECRET_KEY is secure for production environments."""
+        # Only enforce strict validation in production
+        if self.ENVIRONMENT == "production":
+            if not self.SECRET_KEY or len(self.SECRET_KEY) < 32:
+                raise ValueError(
+                    'SECRET_KEY must be set and at least 32 characters for production. '
+                    'Generate one with: python -c "import secrets; print(secrets.token_urlsafe(32))"'
+                )
+            # Check for common weak values
+            weak_keys = [
+                'your-secret-key-change-this-in-production',
+                'change-this',
+                'secret',
+                'password',
+                'admin'
+            ]
+            if self.SECRET_KEY.lower() in weak_keys:
+                raise ValueError('SECRET_KEY must not be a default/example value in production')
+
+        return self
 
     class Config:
         env_file = ".env"
