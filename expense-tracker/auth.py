@@ -10,58 +10,58 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from config import settings
-from database import get_db
+from database import getDb
 from models import User
 from schemas import TokenData
 
 # Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwdContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # OAuth2 scheme for token extraction
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_PREFIX}/auth/login")
+oauth2Scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_PREFIX}/auth/login")
 
 
 # ============================================================================
 # Password Hashing
 # ============================================================================
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+def verifyPassword(plainPassword: str, hashedPassword: str) -> bool:
     """Verify a password against its hash."""
-    return pwd_context.verify(plain_password, hashed_password)
+    return pwdContext.verify(plainPassword, hashedPassword)
 
 
-def get_password_hash(password: str) -> str:
+def getPasswordHash(password: str) -> str:
     """Hash a password."""
-    return pwd_context.hash(password)
+    return pwdContext.hash(password)
 
 
 # ============================================================================
 # JWT Token Management
 # ============================================================================
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+def createAccessToken(data: dict, expiresDelta: Optional[timedelta] = None) -> str:
     """
     Create a JWT access token.
 
     Args:
         data: Dictionary containing token payload
-        expires_delta: Optional custom expiration time
+        expiresDelta: Optional custom expiration time
 
     Returns:
         Encoded JWT token string
     """
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+    toEncode = data.copy()
+    if expiresDelta:
+        expire = datetime.utcnow() + expiresDelta
     else:
         expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    to_encode.update({"exp": expire, "type": "access"})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    return encoded_jwt
+    toEncode.update({"exp": expire, "type": "access"})
+    encodedJwt = jwt.encode(toEncode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return encodedJwt
 
 
-def create_refresh_token(data: dict) -> str:
+def createRefreshToken(data: dict) -> str:
     """
     Create a JWT refresh token with longer expiration.
 
@@ -71,61 +71,61 @@ def create_refresh_token(data: dict) -> str:
     Returns:
         Encoded JWT refresh token string
     """
-    to_encode = data.copy()
+    toEncode = data.copy()
     expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    to_encode.update({"exp": expire, "type": "refresh"})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    return encoded_jwt
+    toEncode.update({"exp": expire, "type": "refresh"})
+    encodedJwt = jwt.encode(toEncode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return encodedJwt
 
 
-def verify_token(
+def verifyToken(
     token: str,
-    credentials_exception: HTTPException,
-    expected_type: str = "access"
+    credentialsException: HTTPException,
+    expectedType: str = "access"
 ) -> TokenData:
     """
     Verify and decode a JWT token with type validation.
 
     Args:
         token: JWT token string
-        credentials_exception: Exception to raise if validation fails
-        expected_type: Expected token type ('access' or 'refresh')
+        credentialsException: Exception to raise if validation fails
+        expectedType: Expected token type ('access' or 'refresh')
 
     Returns:
         TokenData object with user information
 
     Raises:
-        credentials_exception: If token is invalid or expired
+        credentialsException: If token is invalid or expired
         HTTPException: If token type doesn't match expected type
     """
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("sub")
-        user_id: int = payload.get("user_id")
-        token_type: str = payload.get("type")
+        userId: int = payload.get("user_id")
+        tokenType: str = payload.get("type")
 
-        if username is None or user_id is None:
-            raise credentials_exception
+        if username is None or userId is None:
+            raise credentialsException
 
         # Verify token type matches expected type
-        if token_type != expected_type:
+        if tokenType != expectedType:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Invalid token type. Expected {expected_type}, got {token_type}",
+                detail=f"Invalid token type. Expected {expectedType}, got {tokenType}",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        return TokenData(username=username, user_id=user_id)
+        return TokenData(username=username, user_id=userId)
 
     except JWTError:
-        raise credentials_exception
+        raise credentialsException
 
 
 # ============================================================================
 # User Authentication
 # ============================================================================
 
-def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
+def authenticateUser(db: Session, username: str, password: str) -> Optional[User]:
     """
     Authenticate a user by username and password.
     Uses constant-time operations to prevent timing attacks.
@@ -142,21 +142,21 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
 
     # Always verify password even if user doesn't exist (constant time)
     # This prevents username enumeration through timing analysis
-    dummy_hash = get_password_hash("dummy_password_for_timing_consistency")
-    password_hash = user.hashed_password if user else dummy_hash
+    dummyHash = getPasswordHash("dummy_password_for_timing_consistency")
+    passwordHash = user.hashed_password if user else dummyHash
 
-    password_valid = verify_password(password, password_hash)
+    passwordValid = verifyPassword(password, passwordHash)
 
     # Return user only if both user exists AND password is valid
-    if not user or not password_valid:
+    if not user or not passwordValid:
         return None
 
     return user
 
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
+def getCurrentUser(
+    token: str = Depends(oauth2Scheme),
+    db: Session = Depends(getDb)
 ) -> User:
     """
     Dependency to get the current authenticated user.
@@ -171,17 +171,17 @@ def get_current_user(
     Raises:
         HTTPException: If token is invalid or user not found
     """
-    credentials_exception = HTTPException(
+    credentialsException = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    token_data = verify_token(token, credentials_exception)
+    tokenData = verifyToken(token, credentialsException)
 
-    user = db.query(User).filter(User.id == token_data.user_id).first()
+    user = db.query(User).filter(User.id == tokenData.user_id).first()
     if user is None:
-        raise credentials_exception
+        raise credentialsException
 
     if not user.is_active:
         raise HTTPException(
@@ -192,14 +192,14 @@ def get_current_user(
     return user
 
 
-def get_current_active_user(
-    current_user: User = Depends(get_current_user)
+def getCurrentActiveUser(
+    currentUser: User = Depends(getCurrentUser)
 ) -> User:
     """
     Dependency to ensure user is active.
 
     Args:
-        current_user: Current user from get_current_user dependency
+        currentUser: Current user from getCurrentUser dependency
 
     Returns:
         Active User object
@@ -207,9 +207,9 @@ def get_current_active_user(
     Raises:
         HTTPException: If user account is inactive
     """
-    if not current_user.is_active:
+    if not currentUser.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Inactive user"
         )
-    return current_user
+    return currentUser

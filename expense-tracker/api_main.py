@@ -15,7 +15,7 @@ from slowapi.errors import RateLimitExceeded
 import math
 
 from config import settings
-from database import get_db, init_db
+from database import getDb, initDb
 from models import User, Expense
 from schemas import (
     UserCreate, UserResponse, UserLogin, Token,
@@ -23,8 +23,8 @@ from schemas import (
     ExpenseSummary, CategorySummary, ErrorResponse
 )
 from auth import (
-    get_password_hash, authenticate_user, create_access_token,
-    create_refresh_token, get_current_active_user
+    getPasswordHash, authenticateUser, createAccessToken,
+    createRefreshToken, getCurrentActiveUser
 )
 
 # ============================================================================
@@ -70,9 +70,9 @@ if settings.ENVIRONMENT == "production":
 
 # Initialize database on startup
 @app.on_event("startup")
-def on_startup():
+def onStartup():
     """Initialize database tables on application startup."""
-    init_db()
+    initDb()
 
 
 # ============================================================================
@@ -80,7 +80,7 @@ def on_startup():
 # ============================================================================
 
 @app.get("/health")
-async def health_check():
+async def healthCheck():
     """Health check endpoint."""
     return {
         "status": "healthy",
@@ -100,10 +100,10 @@ async def health_check():
     tags=["Authentication"]
 )
 @limiter.limit("5/minute")
-def register_user(
+def registerUser(
     request: Request,
     user: UserCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(getDb)
 ):
     """
     Register a new user.
@@ -113,33 +113,33 @@ def register_user(
     - **password**: Strong password (min 8 chars, 1 digit, 1 uppercase)
     """
     # Check if email already exists
-    db_user = db.query(User).filter(User.email == user.email).first()
-    if db_user:
+    dbUser = db.query(User).filter(User.email == user.email).first()
+    if dbUser:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
         )
 
     # Check if username already exists
-    db_user = db.query(User).filter(User.username == user.username).first()
-    if db_user:
+    dbUser = db.query(User).filter(User.username == user.username).first()
+    if dbUser:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already taken"
         )
 
     # Create new user
-    hashed_password = get_password_hash(user.password)
-    db_user = User(
+    hashedPassword = getPasswordHash(user.password)
+    dbUser = User(
         email=user.email,
         username=user.username,
-        hashed_password=hashed_password
+        hashed_password=hashedPassword
     )
-    db.add(db_user)
+    db.add(dbUser)
     db.commit()
-    db.refresh(db_user)
+    db.refresh(dbUser)
 
-    return db_user
+    return dbUser
 
 
 @app.post(
@@ -151,7 +151,7 @@ def register_user(
 def login(
     request: Request,
     user_login: UserLogin,
-    db: Session = Depends(get_db)
+    db: Session = Depends(getDb)
 ):
     """
     Login and receive access and refresh tokens.
@@ -159,7 +159,7 @@ def login(
     - **username**: Your username
     - **password**: Your password
     """
-    user = authenticate_user(db, user_login.username, user_login.password)
+    user = authenticateUser(db, user_login.username, user_login.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -168,12 +168,12 @@ def login(
         )
 
     # Create tokens
-    access_token = create_access_token(data={"sub": user.username, "user_id": user.id})
-    refresh_token = create_refresh_token(data={"sub": user.username, "user_id": user.id})
+    accessToken = createAccessToken(data={"sub": user.username, "user_id": user.id})
+    refreshToken = createRefreshToken(data={"sub": user.username, "user_id": user.id})
 
     return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
+        "access_token": accessToken,
+        "refresh_token": refreshToken,
         "token_type": "bearer"
     }
 
@@ -183,11 +183,11 @@ def login(
     response_model=UserResponse,
     tags=["Authentication"]
 )
-def get_current_user_info(
-    current_user: User = Depends(get_current_active_user)
+def getCurrentUserInfo(
+    currentUser: User = Depends(getCurrentActiveUser)
 ):
     """Get current authenticated user information."""
-    return current_user
+    return currentUser
 
 
 # ============================================================================
@@ -201,11 +201,11 @@ def get_current_user_info(
     tags=["Expenses"]
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
-def create_expense(
+def createExpense(
     request: Request,
     expense: ExpenseCreate,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    currentUser: User = Depends(getCurrentActiveUser),
+    db: Session = Depends(getDb)
 ):
     """
     Create a new expense.
@@ -214,17 +214,17 @@ def create_expense(
     - **category**: Category name (e.g., Food, Transport)
     - **description**: Expense description
     """
-    db_expense = Expense(
+    dbExpense = Expense(
         amount=expense.amount,
         category=expense.category,
         description=expense.description,
-        user_id=current_user.id
+        user_id=currentUser.id
     )
-    db.add(db_expense)
+    db.add(dbExpense)
     db.commit()
-    db.refresh(db_expense)
+    db.refresh(dbExpense)
 
-    return db_expense
+    return dbExpense
 
 
 @app.get(
@@ -233,7 +233,7 @@ def create_expense(
     tags=["Expenses"]
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
-def list_expenses(
+def listExpenses(
     request: Request,
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(settings.DEFAULT_PAGE_SIZE, ge=1, le=settings.MAX_PAGE_SIZE),
@@ -244,8 +244,8 @@ def list_expenses(
     max_amount: Optional[float] = Query(None, ge=0, description="Maximum amount"),
     sort_by: str = Query("date", enum=["date", "amount", "category"], description="Sort field"),
     sort_order: str = Query("desc", enum=["asc", "desc"], description="Sort order"),
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    currentUser: User = Depends(getCurrentActiveUser),
+    db: Session = Depends(getDb)
 ):
     """
     Get paginated list of expenses with filtering and sorting.
@@ -262,7 +262,7 @@ def list_expenses(
     """
     # Build query
     query = db.query(Expense).filter(
-        Expense.user_id == current_user.id,
+        Expense.user_id == currentUser.id,
         Expense.is_deleted == False
     )
 
@@ -272,8 +272,8 @@ def list_expenses(
 
     if from_date:
         try:
-            from_datetime = datetime.strptime(from_date, "%Y-%m-%d")
-            query = query.filter(Expense.date >= from_datetime)
+            fromDatetime = datetime.strptime(from_date, "%Y-%m-%d")
+            query = query.filter(Expense.date >= fromDatetime)
         except ValueError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -282,8 +282,8 @@ def list_expenses(
 
     if to_date:
         try:
-            to_datetime = datetime.strptime(to_date, "%Y-%m-%d") + timedelta(days=1)
-            query = query.filter(Expense.date < to_datetime)
+            toDatetime = datetime.strptime(to_date, "%Y-%m-%d") + timedelta(days=1)
+            query = query.filter(Expense.date < toDatetime)
         except ValueError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -297,17 +297,17 @@ def list_expenses(
         query = query.filter(Expense.amount <= max_amount)
 
     # Apply sorting using explicit mapping
-    sort_column = SORT_FIELD_MAPPING.get(sort_by)
-    if not sort_column:
+    sortColumn = SORT_FIELD_MAPPING.get(sort_by)
+    if not sortColumn:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid sort_by value: {sort_by}"
         )
 
     if sort_order == "desc":
-        query = query.order_by(sort_column.desc())
+        query = query.order_by(sortColumn.desc())
     else:
-        query = query.order_by(sort_column.asc())
+        query = query.order_by(sortColumn.asc())
 
     # Get total count
     total = query.count()
@@ -333,11 +333,11 @@ def list_expenses(
     response_model=ExpenseSummary,
     tags=["Expenses"]
 )
-def get_expense_summary(
+def getExpenseSummary(
     from_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
     to_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    currentUser: User = Depends(getCurrentActiveUser),
+    db: Session = Depends(getDb)
 ):
     """
     Get expense summary with category breakdown.
@@ -347,15 +347,15 @@ def get_expense_summary(
     """
     # Build query
     query = db.query(Expense).filter(
-        Expense.user_id == current_user.id,
+        Expense.user_id == currentUser.id,
         Expense.is_deleted == False
     )
 
     # Apply date filters
     if from_date:
         try:
-            from_datetime = datetime.strptime(from_date, "%Y-%m-%d")
-            query = query.filter(Expense.date >= from_datetime)
+            fromDatetime = datetime.strptime(from_date, "%Y-%m-%d")
+            query = query.filter(Expense.date >= fromDatetime)
         except ValueError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -364,8 +364,8 @@ def get_expense_summary(
 
     if to_date:
         try:
-            to_datetime = datetime.strptime(to_date, "%Y-%m-%d") + timedelta(days=1)
-            query = query.filter(Expense.date < to_datetime)
+            toDatetime = datetime.strptime(to_date, "%Y-%m-%d") + timedelta(days=1)
+            query = query.filter(Expense.date < toDatetime)
         except ValueError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -386,33 +386,33 @@ def get_expense_summary(
         }
 
     # Calculate totals
-    total_spending = sum(e.amount for e in expenses)
-    total_expenses = len(expenses)
+    totalSpending = sum(e.amount for e in expenses)
+    totalExpenses = len(expenses)
 
     # Calculate category breakdown
-    category_totals = {}
-    category_counts = {}
+    categoryTotals = {}
+    categoryCounts = {}
 
     for expense in expenses:
-        category_totals[expense.category] = category_totals.get(expense.category, 0) + expense.amount
-        category_counts[expense.category] = category_counts.get(expense.category, 0) + 1
+        categoryTotals[expense.category] = categoryTotals.get(expense.category, 0) + expense.amount
+        categoryCounts[expense.category] = categoryCounts.get(expense.category, 0) + 1
 
     categories = [
         CategorySummary(
             category=cat,
             total=total,
-            percentage=(total / total_spending * 100) if total_spending > 0 else 0,
-            count=category_counts[cat]
+            percentage=(total / totalSpending * 100) if totalSpending > 0 else 0,
+            count=categoryCounts[cat]
         )
-        for cat, total in category_totals.items()
+        for cat, total in categoryTotals.items()
     ]
 
     # Sort by total amount descending
     categories.sort(key=lambda x: x.total, reverse=True)
 
     return {
-        "total_spending": total_spending,
-        "total_expenses": total_expenses,
+        "total_spending": totalSpending,
+        "total_expenses": totalExpenses,
         "categories": categories,
         "date_range": {
             "from": from_date,
@@ -426,15 +426,15 @@ def get_expense_summary(
     response_model=ExpenseResponse,
     tags=["Expenses"]
 )
-def get_expense(
+def getExpense(
     expense_id: int,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    currentUser: User = Depends(getCurrentActiveUser),
+    db: Session = Depends(getDb)
 ):
     """Get a specific expense by ID."""
     expense = db.query(Expense).filter(
         Expense.id == expense_id,
-        Expense.user_id == current_user.id,
+        Expense.user_id == currentUser.id,
         Expense.is_deleted == False
     ).first()
 
@@ -453,39 +453,39 @@ def get_expense(
     tags=["Expenses"]
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
-def update_expense(
+def updateExpense(
     request: Request,
     expense_id: int,
-    expense_update: ExpenseUpdate,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    expenseUpdate: ExpenseUpdate,
+    currentUser: User = Depends(getCurrentActiveUser),
+    db: Session = Depends(getDb)
 ):
     """
     Update an existing expense.
 
     All fields are optional. Only provided fields will be updated.
     """
-    db_expense = db.query(Expense).filter(
+    dbExpense = db.query(Expense).filter(
         Expense.id == expense_id,
-        Expense.user_id == current_user.id,
+        Expense.user_id == currentUser.id,
         Expense.is_deleted == False
     ).first()
 
-    if not db_expense:
+    if not dbExpense:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Expense not found"
         )
 
     # Update only provided fields
-    update_data = expense_update.dict(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(db_expense, field, value)
+    updateData = expenseUpdate.dict(exclude_unset=True)
+    for field, value in updateData.items():
+        setattr(dbExpense, field, value)
 
     db.commit()
-    db.refresh(db_expense)
+    db.refresh(dbExpense)
 
-    return db_expense
+    return dbExpense
 
 
 @app.delete(
@@ -494,31 +494,31 @@ def update_expense(
     tags=["Expenses"]
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
-def delete_expense(
+def deleteExpense(
     request: Request,
     expense_id: int,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    currentUser: User = Depends(getCurrentActiveUser),
+    db: Session = Depends(getDb)
 ):
     """
     Delete an expense (soft delete).
 
     The expense is marked as deleted but remains in the database for audit purposes.
     """
-    db_expense = db.query(Expense).filter(
+    dbExpense = db.query(Expense).filter(
         Expense.id == expense_id,
-        Expense.user_id == current_user.id,
+        Expense.user_id == currentUser.id,
         Expense.is_deleted == False
     ).first()
 
-    if not db_expense:
+    if not dbExpense:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Expense not found"
         )
 
     # Soft delete
-    db_expense.is_deleted = True
+    dbExpense.is_deleted = True
     db.commit()
 
     return None
@@ -529,7 +529,7 @@ def delete_expense(
 # ============================================================================
 
 @app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
+async def httpExceptionHandler(request: Request, exc: HTTPException):
     """Custom HTTP exception handler for consistent error responses."""
     return JSONResponse(
         status_code=exc.status_code,
@@ -544,7 +544,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 @app.exception_handler(Exception)
-async def general_exception_handler(request: Request, exc: Exception):
+async def generalExceptionHandler(request: Request, exc: Exception):
     """General exception handler for unexpected errors."""
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

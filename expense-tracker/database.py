@@ -19,7 +19,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db():
+def getDb():
     """
     Dependency function to get database session.
 
@@ -33,6 +33,6 @@ def get_db():
         db.close()
 
 
-def init_db():
+def initDb():
     """Initialize database by creating all tables."""
     Base.metadata.create_all(bind=engine)

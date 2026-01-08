@@ -585,6 +585,120 @@ This separation makes the code:
 - **More maintainable**: Changes to UI don't affect business logic
 - **More reusable**: The tracker can be used programmatically or with different UIs
 
+## Code Style and Naming Conventions
+
+This project follows a **hybrid naming convention** that balances internal code consistency with external API contract stability.
+
+### Internal Code (camelCase)
+
+All internal Python code uses camelCase:
+
+```python
+# Variables
+currentUser = getCurrentUser()
+dbExpense = database.query(Expense).first()
+totalSpending = sum(amounts)
+categoryTotals = {}
+
+# Functions
+def addExpense(amount, category):
+    ...
+
+def calculateTotal():
+    ...
+
+def authenticateUser(username, password):
+    ...
+
+# Private methods
+def _loadExpenses(self):
+    ...
+
+def _saveExpenses(self):
+    ...
+```
+
+### External API Contracts (snake_case)
+
+External interfaces **must use snake_case** to maintain compatibility:
+
+**FastAPI Path Parameters:**
+```python
+# ✅ CORRECT: Parameter name matches URL
+@app.get("/expenses/{expense_id}")
+def getExpense(expense_id: int):  # Must match {expense_id} in URL
+    ...
+
+# ❌ WRONG: Will cause 422 validation errors
+@app.get("/expenses/{expense_id}")
+def getExpense(expenseId: int):  # FastAPI cannot bind this!
+    ...
+```
+
+**Query Parameters:**
+```python
+# ✅ CORRECT: Matches URL query string ?page_size=20
+def listExpenses(page_size: int = Query(20)):
+    itemsPerPage = page_size  # Internal variable can use camelCase
+    ...
+
+# ❌ WRONG: Won't match ?page_size=20 in URL
+def listExpenses(pageSize: int = Query(20)):
+    ...
+```
+
+**Database Columns (SQLAlchemy):**
+```python
+class Expense(Base):
+    user_id = Column(Integer, ForeignKey("users.id"))  # snake_case
+    is_deleted = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+```
+
+**JSON Fields (Pydantic Schemas):**
+```python
+class Token(BaseModel):
+    access_token: str  # snake_case for JSON API
+    refresh_token: str
+    token_type: str
+```
+
+### Why This Matters
+
+**The Problem:**
+FastAPI uses parameter names for binding. If your function parameter doesn't match the URL template or query string format, FastAPI cannot bind the value, resulting in 422 validation errors.
+
+**The Solution:**
+- Use snake_case for all parameters that come from HTTP requests (path, query, body)
+- Use camelCase for all internal variables, functions, and logic
+- Keep database columns and JSON fields as snake_case (standard REST API convention)
+
+### Testing Conventions
+
+**Test Functions:**
+- Use snake_case for pytest compatibility: `test_create_expense_success()`
+- Python test discovery requires snake_case with `test_` prefix
+
+**Test Fixtures:**
+- Use camelCase: `testDb`, `testUser`, `authHeaders`, `testExpense`
+
+**Internal Variables in Tests:**
+- Use camelCase: `expenseData`, `expectedTotal`, `foodCategory`
+
+**Example:**
+```python
+@pytest.fixture
+def testUser(testDb):  # camelCase fixture
+    user = User(email="test@example.com")
+    testDb.add(user)
+    return user
+
+def test_create_expense_success(client, authHeaders):  # snake_case test function
+    expenseData = {"amount": 25.50, "category": "Food"}  # camelCase variable
+    response = client.post("/api/v1/expenses", json=expenseData)
+    assert response.status_code == 201
+```
+
 ## API Reference
 
 ### Expense Class

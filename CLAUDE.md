@@ -130,8 +130,48 @@ curl http://localhost:8000/health
 
 ### Code Style and Naming
 
-**Python Code:**
-- Use **camelCase** for variables and functions when working on Python files in this repository
+**Python Naming Convention - Internal vs External:**
+
+This repository follows a **hybrid naming convention** that balances internal code consistency with external API contract stability:
+
+**Internal Code (camelCase):**
+- **Local variables**: `currentUser`, `dbExpense`, `hashedPassword`, `totalSpending`
+- **Function names**: `addExpense()`, `getAllExpenses()`, `calculateTotal()`, `authenticateUser()`
+- **Private methods**: `_loadExpenses()`, `_saveExpenses()`, `_validateAmount()`, `_generateNextId()`
+- **Function parameters** (non-API): `expenseId`, `categoryTotals`, `fromDatetime`, `toDatetime`
+- **Class attributes** (internal): `self.dataFile`, `self.expenses`
+
+**External API Contracts (snake_case - MUST NOT CHANGE):**
+- **FastAPI path parameters**: `expense_id` in `/expenses/{expense_id}` must match function parameter
+- **Query parameters**: `page_size`, `from_date`, `to_date`, `sort_by`, `sort_order` (match URL query strings)
+- **Request body fields**: `user_login` (Pydantic model field names)
+- **Database columns**: `user_id`, `is_deleted`, `created_at`, `hashed_password` (SQLAlchemy models)
+- **JSON response fields**: `access_token`, `refresh_token`, `total_spending` (Pydantic schemas)
+
+**Why This Matters:**
+```python
+# ✅ CORRECT: Path parameter matches URL template
+@app.get("/expenses/{expense_id}")
+def getExpense(expense_id: int, currentUser: User = Depends(getCurrentActiveUser)):
+    dbExpense = db.query(Expense).filter(Expense.id == expense_id).first()
+    return dbExpense
+
+# ❌ WRONG: Path parameter doesn't match URL template
+@app.get("/expenses/{expense_id}")
+def getExpense(expenseId: int):  # FastAPI cannot bind this!
+    ...
+
+# ✅ CORRECT: Query parameter matches URL query string
+def listExpenses(page_size: int = Query(20)):  # Matches ?page_size=20
+    itemsPerPage = page_size  # Internal variable can use camelCase
+    ...
+
+# ❌ WRONG: Query parameter won't match URL
+def listExpenses(pageSize: int = Query(20)):  # Won't match ?page_size=20
+    ...
+```
+
+**Additional Python Standards:**
 - Comprehensive docstrings for all classes and methods
 - Type hints throughout (Python 3.8+)
 - Custom exceptions for domain errors (e.g., ValidationError)
@@ -180,11 +220,17 @@ curl http://localhost:8000/health
 
 ### Testing Conventions
 
+**Test Naming:**
+- **Test functions**: Use snake_case for pytest discovery: `test_create_expense_success()`
+- **Fixtures**: Use camelCase: `testDb`, `testUser`, `authHeaders`, `testExpense`
+- **Internal variables**: Use camelCase: `expenseId`, `expensesData`, `foodCategory`, `user2Headers`
+
 **CLI Tests** (`test_tracker.py`):
 - Unit tests for business logic (Expense, ExpenseTracker)
 - Validation error testing
 - Data persistence verification
 - Automatic cleanup of test files
+- Uses camelCase for variables: `testFile`, `expectedTotal`
 
 **API Tests** (`test_api.py`):
 - Integration tests with FastAPI TestClient
@@ -192,11 +238,29 @@ curl http://localhost:8000/health
 - Auth flow testing (register → login → protected endpoints)
 - Edge cases: invalid tokens, missing fields, unauthorized access
 - Response format validation
+- Fixtures use camelCase: `testDb()`, `testUser()`, `authHeaders()`
 
 **Run Tests Before Committing:**
 ```bash
-python test_tracker.py        # CLI tests
-pytest test_api.py -v         # API tests with verbose output
+python test_tracker.py        # CLI tests (all should pass)
+pytest test_api.py -v         # API tests with verbose output (26 tests)
+```
+
+**Test Structure Example:**
+```python
+# Fixture with camelCase
+@pytest.fixture
+def testUser(testDb):
+    user = User(email="test@example.com", username="testuser")
+    testDb.add(user)
+    return user
+
+# Test function with snake_case (pytest convention)
+def test_create_expense_success(client, authHeaders):
+    # Internal variables use camelCase
+    expenseData = {"amount": 25.50, "category": "Food"}
+    response = client.post("/api/v1/expenses", json=expenseData, headers=authHeaders)
+    assert response.status_code == 201
 ```
 
 ### Git Workflow

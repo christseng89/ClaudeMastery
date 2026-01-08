@@ -2,7 +2,7 @@
 
 ## API Reviewer Agent
 
-<https://github.com/firstlink/claude-code/blob/main/slash-commands-and-agents/.claude/agents/api-reviewer.md>
+[https://github.com/firstlink/claude-code/blob/main/slash-commands-and-agents/.claude/agents/api-reviewer.md](https://github.com/firstlink/claude-code/blob/main/slash-commands-and-agents/.claude/agents/api-reviewer.md)
 
 ```bash
 cat << 'EOF' > .claude/agents/api-reviewer.md
@@ -305,11 +305,11 @@ venv\Scripts\activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
+# Run tests
+pytest test_api.py -v
+
 # Run the API server
 python api_main.py
-
-# Or run tests
-pytest test_api.py -v
 
 **Note:** All 26 tests pass successfully! The virtual environment isolates dependencies and prevents conflicts.
 ```
@@ -324,17 +324,17 @@ curl -X POST "http://localhost:8000/api/v1/auth/login" \
     -d '{"username":"john","password":"SecurePass123"}'
 
 curl -X POST "http://localhost:8000/api/v1/expenses" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huIiwidXNlcl9pZCI6MSwiZXhwIjoxNzY3ODUwNzQ5LCJ0eXBlIjoiYWNjZXNzIn0.BIUO8giVh0F30jdxBcNH_zgMWIa_nJoHyRwjD8EERwc" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huIiwidXNlcl9pZCI6MSwiZXhwIjoxNzY3ODczMTQ4LCJ0eXBlIjoiYWNjZXNzIn0.E6wL_bbDhRcnM87DVmsEN7p7wCl3bEY4AkOP-m-x4Sk" \
   -H "Content-Type: application/json" \
-  -d '{"amount":45.50,"category":"Food","description":"Dinner"}'
+  -d '{"amount":35.80,"category":"Food","description":"Dinner"}'
 
 curl -X POST "http://localhost:8000/api/v1/expenses" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huIiwidXNlcl9pZCI6MSwiZXhwIjoxNzY3ODUwNzQ5LCJ0eXBlIjoiYWNjZXNzIn0.BIUO8giVh0F30jdxBcNH_zgMWIa_nJoHyRwjD8EERwc" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huIiwidXNlcl9pZCI6MSwiZXhwIjoxNzY3ODczMTQ4LCJ0eXBlIjoiYWNjZXNzIn0.E6wL_bbDhRcnM87DVmsEN7p7wCl3bEY4AkOP-m-x4Sk" \
   -H "Content-Type: application/json" \
-  -d '{"amount":10.0,"category":"Grocery","description":"Apples and bananas"}'
+  -d '{"amount":12.3,"category":"Grocery","description":"Apples and bananas"}'
 
 curl -X GET "http://localhost:8000/api/v1/expenses/summary" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huIiwidXNlcl9pZCI6MSwiZXhwIjoxNzY3ODUwNzQ5LCJ0eXBlIjoiYWNjZXNzIn0.BIUO8giVh0F30jdxBcNH_zgMWIa_nJoHyRwjD8EERwc"
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huIiwidXNlcl9pZCI6MSwiZXhwIjoxNzY3ODczMTQ4LCJ0eXBlIjoiYWNjZXNzIn0.E6wL_bbDhRcnM87DVmsEN7p7wCl3bEY4AkOP-m-x4Sk"
 
 curl -X 'POST' \
   'http://localhost:8000/api/v1/auth/login' \
