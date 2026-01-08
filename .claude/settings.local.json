@@ -16,7 +16,10 @@
       "Bash(venv/Scripts/pip.exe show:*)",
       "Bash(venv/Scripts/python.exe -m pytest test_api.py -v)",
       "Bash(venv/Scripts/python.exe:*)",
-      "Bash(venv/Scripts/pip.exe:*)"
+      "Bash(venv/Scripts/pip.exe:*)",
+      "Bash(ls:*)",
+      "Bash(pip install:*)",
+      "Bash(timeout 5 python:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
