@@ -3,6 +3,7 @@ FastAPI main application for Expense Tracker REST API.
 """
 from fastapi import FastAPI, Depends, HTTPException, status, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
@@ -25,6 +26,17 @@ from auth import (
     get_password_hash, authenticate_user, create_access_token,
     create_refresh_token, get_current_active_user
 )
+
+# ============================================================================
+# Constants and Mappings
+# ============================================================================
+
+# Explicit mapping for sort fields to prevent attribute injection
+SORT_FIELD_MAPPING = {
+    "date": Expense.date,
+    "amount": Expense.amount,
+    "category": Expense.category
+}
 
 # ============================================================================
 # Application Setup
@@ -51,6 +63,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# HTTPS Enforcement for Production
+if settings.ENVIRONMENT == "production":
+    app.add_middleware(HTTPSRedirectMiddleware)
 
 # Initialize database on startup
 @app.on_event("startup")
@@ -280,8 +296,14 @@ def list_expenses(
     if max_amount is not None:
         query = query.filter(Expense.amount <= max_amount)
 
-    # Apply sorting
-    sort_column = getattr(Expense, sort_by)
+    # Apply sorting using explicit mapping
+    sort_column = SORT_FIELD_MAPPING.get(sort_by)
+    if not sort_column:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid sort_by value: {sort_by}"
+        )
+
     if sort_order == "desc":
         query = query.order_by(sort_column.desc())
     else:

@@ -78,27 +78,42 @@ def create_refresh_token(data: dict) -> str:
     return encoded_jwt
 
 
-def verify_token(token: str, credentials_exception: HTTPException) -> TokenData:
+def verify_token(
+    token: str,
+    credentials_exception: HTTPException,
+    expected_type: str = "access"
+) -> TokenData:
     """
-    Verify and decode a JWT token.
+    Verify and decode a JWT token with type validation.
 
     Args:
         token: JWT token string
         credentials_exception: Exception to raise if validation fails
+        expected_type: Expected token type ('access' or 'refresh')
 
     Returns:
         TokenData object with user information
 
     Raises:
         credentials_exception: If token is invalid or expired
+        HTTPException: If token type doesn't match expected type
     """
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("sub")
         user_id: int = payload.get("user_id")
+        token_type: str = payload.get("type")
 
         if username is None or user_id is None:
             raise credentials_exception
+
+        # Verify token type matches expected type
+        if token_type != expected_type:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Invalid token type. Expected {expected_type}, got {token_type}",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
         return TokenData(username=username, user_id=user_id)
 
@@ -113,6 +128,7 @@ def verify_token(token: str, credentials_exception: HTTPException) -> TokenData:
 def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
     """
     Authenticate a user by username and password.
+    Uses constant-time operations to prevent timing attacks.
 
     Args:
         db: Database session
@@ -123,10 +139,18 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
         User object if authentication successful, None otherwise
     """
     user = db.query(User).filter(User.username == username).first()
-    if not user:
+
+    # Always verify password even if user doesn't exist (constant time)
+    # This prevents username enumeration through timing analysis
+    dummy_hash = get_password_hash("dummy_password_for_timing_consistency")
+    password_hash = user.hashed_password if user else dummy_hash
+
+    password_valid = verify_password(password, password_hash)
+
+    # Return user only if both user exists AND password is valid
+    if not user or not password_valid:
         return None
-    if not verify_password(password, user.hashed_password):
-        return None
+
     return user
 
 
