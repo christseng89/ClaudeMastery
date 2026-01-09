@@ -4,29 +4,32 @@ Personal Finance Tracker CLI
 A command-line application for tracking personal financial transactions.
 """
 
-import argparse
 import json
-import os
 from datetime import datetime
+from decimal import Decimal
+from pathlib import Path
 from typing import Dict, List, Optional
+
+import click
 
 
 class ValidationError(Exception):
     """Custom exception for validation errors."""
+
     pass
 
 
 class FinanceTracker:
     """Manages personal finance transactions with persistent storage."""
 
-    def __init__(self, data_file: str = "transactions.json"):
+    def __init__(self, data_file: str = "transactions.json") -> None:
         """
         Initialize the finance tracker.
 
         Args:
             data_file: Path to JSON file for storing transactions
         """
-        self.data_file = data_file
+        self.data_file = Path(data_file)
         self.transactions = self._load_transactions()
 
     def _load_transactions(self) -> List[Dict]:
@@ -36,9 +39,9 @@ class FinanceTracker:
         Returns:
             List of transaction dictionaries
         """
-        if os.path.exists(self.data_file):
+        if self.data_file.exists():
             try:
-                with open(self.data_file, 'r') as f:
+                with self.data_file.open("r") as f:
                     return json.load(f)
             except (json.JSONDecodeError, IOError):
                 return []
@@ -46,10 +49,10 @@ class FinanceTracker:
 
     def _save_transactions(self) -> None:
         """Save transactions to JSON file."""
-        with open(self.data_file, 'w') as f:
+        with self.data_file.open("w") as f:
             json.dump(self.transactions, f, indent=2)
 
-    def _validate_amount(self, amount: float) -> None:
+    def _validate_amount(self, amount: Decimal) -> None:
         """
         Validate transaction amount.
 
@@ -59,8 +62,8 @@ class FinanceTracker:
         Raises:
             ValidationError: If amount is invalid
         """
-        if not isinstance(amount, (int, float)):
-            raise ValidationError("Amount must be a number")
+        if not isinstance(amount, Decimal):
+            raise ValidationError("Amount must be a Decimal")
         if amount <= 0:
             raise ValidationError("Amount must be greater than zero")
 
@@ -78,10 +81,7 @@ class FinanceTracker:
             raise ValidationError("Category cannot be empty")
 
     def add_transaction(
-        self,
-        amount: float,
-        category: str,
-        description: Optional[str] = None
+        self, amount: Decimal, category: str, description: Optional[str] = None
     ) -> Dict:
         """
         Add a new financial transaction.
@@ -102,10 +102,10 @@ class FinanceTracker:
         self._validate_category(category)
 
         transaction = {
-            "amount": amount,
+            "amount": str(amount),  # Store as string to preserve precision
             "category": category.strip(),
             "description": description.strip() if description else "",
-            "date": datetime.now().isoformat()
+            "date": datetime.now().isoformat(),
         }
 
         self.transactions.append(transaction)
@@ -120,73 +120,61 @@ class FinanceTracker:
         Args:
             transaction: Transaction dictionary to display
         """
-        print("\n" + "=" * 50)
-        print("Transaction Added Successfully!")
-        print("=" * 50)
-        print(f"Amount:      ${transaction['amount']:.2f}")
-        print(f"Category:    {transaction['category']}")
-        if transaction['description']:
-            print(f"Description: {transaction['description']}")
-        print(f"Date:        {transaction['date']}")
-        print("=" * 50 + "\n")
+        amount = Decimal(transaction["amount"])
+        click.echo("\n" + "=" * 50)
+        click.echo("Transaction Added Successfully!")
+        click.echo("=" * 50)
+        click.echo(f"Amount:      ${amount:.2f}")
+        click.echo(f"Category:    {transaction['category']}")
+        if transaction["description"]:
+            click.echo(f"Description: {transaction['description']}")
+        click.echo(f"Date:        {transaction['date']}")
+        click.echo("=" * 50 + "\n")
 
 
-def main():
-    """Main entry point for the CLI application."""
-    parser = argparse.ArgumentParser(
-        description="Personal Finance Tracker CLI - Track your financial transactions",
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+@click.group()
+def cli() -> None:
+    """Personal Finance Tracker CLI - Track your financial transactions."""
+    pass
 
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-    # Add command
-    add_parser = subparsers.add_parser(
-        'add',
-        help='Add a new financial transaction'
-    )
-    add_parser.add_argument(
-        '--amount',
-        type=float,
-        required=True,
-        help='The transaction amount (e.g., 25.50)'
-    )
-    add_parser.add_argument(
-        '--category',
-        type=str,
-        required=True,
-        help='The transaction category (e.g., groceries, utilities, entertainment)'
-    )
-    add_parser.add_argument(
-        '--description',
-        type=str,
-        required=False,
-        help='Additional details about the transaction'
-    )
-
-    args = parser.parse_args()
-
-    if args.command is None:
-        parser.print_help()
-        return
-
+@cli.command()
+@click.option(
+    "--amount",
+    type=str,
+    required=True,
+    help="The transaction amount (e.g., 25.50)",
+)
+@click.option(
+    "--category",
+    type=str,
+    required=True,
+    help="The transaction category (e.g., groceries, utilities, entertainment)",
+)
+@click.option(
+    "--description",
+    type=str,
+    required=False,
+    help="Additional details about the transaction",
+)
+def add(amount: str, category: str, description: Optional[str]) -> None:
+    """Add a new financial transaction."""
     tracker = FinanceTracker()
 
-    if args.command == 'add':
-        try:
-            transaction = tracker.add_transaction(
-                amount=args.amount,
-                category=args.category,
-                description=args.description
-            )
-            tracker.display_transaction(transaction)
-        except ValidationError as e:
-            print(f"\nValidation Error: {e}\n")
-            return
-        except Exception as e:
-            print(f"\nError adding transaction: {e}\n")
-            return
+    try:
+        # Convert string amount to Decimal
+        decimal_amount = Decimal(amount)
+        transaction = tracker.add_transaction(
+            amount=decimal_amount, category=category, description=description
+        )
+        tracker.display_transaction(transaction)
+    except ValidationError as e:
+        click.echo(f"\nValidation Error: {e}\n", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"\nError adding transaction: {e}\n", err=True)
+        raise click.Abort()
 
 
 if __name__ == "__main__":
-    main()
+    cli()
