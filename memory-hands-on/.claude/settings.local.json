@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(python finance_tracker.py:*)",
+      "Bash(git add:*)"
+    ]
+  },
+  "disabledMcpjsonServers": [
+    "weather"
+  ]
+}
