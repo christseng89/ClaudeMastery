@@ -46,6 +46,8 @@ memory-hands-on/
 ├── .python-version                # Python version specification (3.12.10)
 ├── CLAUDE.md                      # This file - project guidance for Claude Code
 ├── README.md                      # User-facing project documentation
+├── requirements.txt               # Runtime dependencies (click)
+├── requirements-dev.txt           # Development dependencies (pytest)
 ├── finance_tracker.py             # Main application (executable)
 ├── test_finance_tracker.py        # Comprehensive test suite (pytest)
 └── transactions.json              # Persistent storage (auto-created, gitignored)
@@ -109,11 +111,19 @@ Each transaction is stored as a dictionary:
 **Installation:**
 ```bash
 # Install runtime dependencies
-pip install click
+pip install -r requirements.txt
 
-# Install development dependencies
-pip install pytest
+# Install development dependencies (includes pytest)
+pip install -r requirements-dev.txt
+
+# Or install manually
+pip install click    # Runtime
+pip install pytest   # Development
 ```
+
+**Dependency Files:**
+- `requirements.txt`: Contains runtime dependencies (click>=8.0.0)
+- `requirements-dev.txt`: Contains development dependencies and includes requirements.txt
 
 ### Testing
 
@@ -189,7 +199,8 @@ This project configures specific permissions for Claude Code:
 **Setting Up:**
 ```bash
 # Install dependencies
-pip install click pytest
+pip install -r requirements.txt          # Runtime only
+pip install -r requirements-dev.txt      # Runtime + development
 
 # Run the application
 python finance_tracker.py --help
@@ -397,6 +408,10 @@ This project helps developers practice:
 ### Common Commands
 
 ```bash
+# Install dependencies
+pip install -r requirements.txt          # Runtime only
+pip install -r requirements-dev.txt      # Runtime + development
+
 # Help
 python finance_tracker.py --help
 

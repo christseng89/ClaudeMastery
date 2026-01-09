@@ -28,10 +28,11 @@ This CLI application helps you manage your personal finances by tracking transac
 1. Clone or download this directory
 2. Install dependencies:
    ```bash
-   pip install click
+   # Install runtime dependencies
+   pip install -r requirements.txt
 
-   # Optional: Install pytest for running tests
-   pip install pytest
+   # Optional: Install development dependencies (includes pytest)
+   pip install -r requirements-dev.txt
    ```
 3. Make the script executable (optional):
    ```bash
@@ -154,6 +155,8 @@ If `transactions.json` becomes corrupted or is deleted:
 memory-hands-on/
 ├── finance_tracker.py       # Main application
 ├── test_finance_tracker.py  # Comprehensive test suite (pytest)
+├── requirements.txt         # Runtime dependencies (click)
+├── requirements-dev.txt     # Development dependencies (pytest)
 ├── transactions.json        # Data storage (auto-created)
 ├── README.md               # This file
 ├── CLAUDE.md               # Claude Code guidance
@@ -199,10 +202,14 @@ memory-hands-on/
 **Installation:**
 ```bash
 # Install runtime dependencies
-pip install click
+pip install -r requirements.txt
 
-# Install development dependencies
-pip install pytest
+# Install development dependencies (includes pytest)
+pip install -r requirements-dev.txt
+
+# Or install manually
+pip install click  # Runtime
+pip install pytest  # Development
 ```
 
 ### Python Version
@@ -328,7 +335,7 @@ This project is part of the **Claude Code Learning & Mastery Repository** and sp
 ### Common Issues
 
 **Issue:** "No module named 'click'" error
-- **Solution:** Install Click with `pip install click`
+- **Solution:** Install dependencies with `pip install -r requirements.txt` or manually with `pip install click`
 
 **Issue:** "No such file or directory" error
 - **Solution:** Make sure you're in the correct directory containing `finance_tracker.py`
@@ -343,7 +350,7 @@ This project is part of the **Claude Code Learning & Mastery Repository** and sp
 - **Solution:** Delete the file and it will be recreated on next transaction
 
 **Issue:** Tests not running
-- **Solution:** Install pytest with `pip install pytest` and run `pytest test_finance_tracker.py -v`
+- **Solution:** Install development dependencies with `pip install -r requirements-dev.txt` or manually with `pip install pytest`, then run `pytest test_finance_tracker.py -v`
 
 ### Getting Help
 

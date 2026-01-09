@@ -1,0 +1,11 @@
+# Finance Tracker CLI - Development Dependencies
+# Install with: pip install -r requirements-dev.txt
+
+# Include runtime dependencies
+-r requirements.txt
+
+# Testing framework
+pytest>=7.0.0
+
+# Optional: Code coverage reporting
+# pytest-cov>=4.0.0

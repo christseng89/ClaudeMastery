@@ -1,0 +1,9 @@
+# Finance Tracker CLI - Runtime Dependencies
+# Install with: pip install -r requirements.txt
+
+# CLI framework with decorators and options
+click>=8.0.0
+
+# Development Dependencies (optional)
+# Uncomment to install development tools:
+# pytest>=7.0.0

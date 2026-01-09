@@ -191,6 +191,10 @@ Update the project README.md in this directory.
 /auto-commit
 
 
+Generate requirements.txt for this project and update CLAUDE.md and README.md accordingly.
+/clear
+/auto-commit
+
 ```
 
 ```cmd
