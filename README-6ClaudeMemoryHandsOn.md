@@ -184,8 +184,13 @@ Use the user memory to update the python code in this directory and test it.
 
 I do NO see python test files. You missed testing coverage as part of user memory. Fix it.
 /clear
-
 /auto-commit
+
+Update the project README.md in this directory.
+/clear
+/auto-commit
+
+
 ```
 
 ```cmd
