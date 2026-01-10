@@ -7,7 +7,7 @@ Follows API-specific conventions from src/CLAUDE.md:
 - Response models inherit from BaseModel with from_attributes
 """
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, field_serializer, ConfigDict
 from decimal import Decimal
 from datetime import datetime
 from typing import Optional
@@ -41,28 +41,32 @@ class TransactionCreate(BaseModel):
 class TransactionResponse(BaseModel):
     """Response schema for transaction data."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int = Field(..., description='Transaction unique identifier')
     amount: Decimal = Field(..., description='Transaction amount')
     category: str = Field(..., description='Transaction category')
     description: str = Field(..., description='Transaction details')
     date: datetime = Field(..., description='Transaction timestamp (ISO-8601)')
 
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            Decimal: lambda v: str(v),  # Preserve decimal precision as string
-            datetime: lambda v: v.isoformat()
-        }
+    @field_serializer('amount')
+    def serialize_amount(self, value: Decimal) -> str:
+        """Serialize Decimal to string to preserve precision."""
+        return str(value)
+
+    @field_serializer('date')
+    def serialize_date(self, value: datetime) -> str:
+        """Serialize datetime to ISO format string."""
+        return value.isoformat()
 
 
 class TransactionListResponse(BaseModel):
     """Response schema for list of transactions."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     transactions: list[TransactionResponse] = Field(..., description='List of transactions')
     total_count: int = Field(..., description='Total number of transactions')
-
-    class Config:
-        from_attributes = True
 
 
 class ErrorResponse(BaseModel):

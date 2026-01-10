@@ -15,7 +15,8 @@
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
       "Bash(python test_api_manual.py:*)",
-      "Bash(python src/api/test_api.py:*)"
+      "Bash(python src/api/test_api.py:*)",
+      "Bash(python -m uvicorn:*)"
     ]
   },
   "disabledMcpjsonServers": [
