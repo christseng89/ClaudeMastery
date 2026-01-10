@@ -1,0 +1,58 @@
+[
+  {
+    "id": 2,
+    "amount": "25.5",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-10T18:44:03.385576"
+  },
+  {
+    "id": 3,
+    "amount": "25.5",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-10T18:56:50.334001"
+  },
+  {
+    "id": 4,
+    "amount": "25.50",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-10T19:09:37.242162"
+  },
+  {
+    "id": 5,
+    "amount": "25.50",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-10T19:10:59.767561"
+  },
+  {
+    "id": 6,
+    "amount": "25.5",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-10T19:16:18.902805"
+  },
+  {
+    "id": 7,
+    "amount": "150.75",
+    "category": "utilities",
+    "description": "Monthly electricity bill",
+    "date": "2026-01-10T19:17:05.185228"
+  },
+  {
+    "id": 8,
+    "amount": "25.5",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-10T19:21:56.638902"
+  },
+  {
+    "id": 9,
+    "amount": "25.5",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-10T19:23:34.095718"
+  }
+]
