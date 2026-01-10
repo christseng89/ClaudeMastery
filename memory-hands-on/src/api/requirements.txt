@@ -1,0 +1,16 @@
+# FastAPI REST API Dependencies
+# Personal Finance Tracker API
+
+# FastAPI framework with Pydantic v2 support
+fastapi>=0.109.0
+
+# ASGI server for running FastAPI
+uvicorn[standard]>=0.27.0
+
+# Additional standard library dependencies (already included in Python)
+# - decimal: Precise decimal arithmetic for financial calculations
+# - json: JSON serialization/deserialization
+# - logging: Structured logging for production
+# - pathlib: Modern file path operations
+# - datetime: Timestamp generation
+# - typing: Type hints

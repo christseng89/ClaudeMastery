@@ -7,7 +7,15 @@
       "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd memory-hands-on finance tracker CLI with comprehensive documentation\n\nCreate a hands-on learning project demonstrating Claude Code''s memory management capabilities. This personal finance tracker CLI includes complete documentation showing the difference between session-specific \\(# commands\\) and project-level \\(CLAUDE.md\\) memory.\n\nKey additions:\n- finance_tracker.py: CLI app with validation, JSON persistence, zero dependencies\n- CLAUDE.md: Comprehensive project guidance with memory management examples\n- README.md: User-facing documentation with quick start and usage guide\n- .claude/settings.local.json: Claude Code permissions configuration\n- .gitignore: Excludes transactions.json for privacy\n- .python-version: Specifies Python 3.12.10\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nRefactor finance tracker to use Decimal and Click following user preferences\n\nUpdate finance_tracker.py to align with personal Python coding standards from user memory:\n- Replace float with Decimal for all financial calculations to avoid floating-point errors\n- Replace argparse with Click CLI framework for better command structure\n- Replace os.path with pathlib for modern file operations\n- Add comprehensive type hints including return type annotations\n- Apply Black formatting standards \\(88-char line length\\)\n\nTechnical changes:\n- Store amounts as strings in JSON to preserve Decimal precision\n- Use click.group\\(\\) and click.option\\(\\) for CLI structure\n- Use Path.exists\\(\\) and Path.open\\(\\) for file handling\n- Enhanced error handling with click.Abort\\(\\)\n\nAll tests pass: help commands, transaction validation, and decimal precision.\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(pytest:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(pip install:*)",
+      "Bash(curl:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(python -c:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(python test_api_manual.py:*)",
+      "Bash(python src/api/test_api.py:*)"
     ]
   },
   "disabledMcpjsonServers": [
