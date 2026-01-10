@@ -488,6 +488,43 @@ rm api_transactions.json
 uvicorn src.api.main:app --reload
 ```
 
+### Issue: Internal Server Error (500) on all endpoints
+**Cause:** Pydantic v1 vs v2 syntax mismatch
+
+**Symptoms:**
+- All API endpoints return 500 Internal Server Error
+- Health endpoint works but transaction endpoints fail
+- No detailed error message in response
+
+**Solution:** Ensure Pydantic v2 syntax is used in `schemas.py`:
+
+```python
+# ✓ CORRECT - Pydantic v2 syntax
+from pydantic import BaseModel, field_serializer, ConfigDict
+
+class TransactionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    amount: Decimal
+    date: datetime
+
+    @field_serializer('amount')
+    def serialize_amount(self, value: Decimal) -> str:
+        return str(value)
+
+# ✗ WRONG - Pydantic v1 syntax (deprecated)
+class TransactionResponse(BaseModel):
+    class Config:  # This causes 500 errors in Pydantic v2!
+        from_attributes = True
+        json_encoders = {Decimal: lambda v: str(v)}
+```
+
+**Check your version:**
+```bash
+python -c "import pydantic; print(pydantic.__version__)"
+# Should be 2.x.x (e.g., 2.5.3)
+```
+
 ## Related Documentation
 
 - **src/CLAUDE.md** - API-specific conventions and memory configuration

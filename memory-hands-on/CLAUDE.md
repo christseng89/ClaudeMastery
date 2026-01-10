@@ -4,17 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Personal Finance Tracker CLI** - a hands-on practice project demonstrating Claude Code's memory and context management capabilities. It's a simple yet functional command-line application for tracking personal financial transactions with categories, amounts, and descriptions.
+This is a **Personal Finance Tracker** with dual implementations - a hands-on practice project demonstrating Claude Code's memory and context management capabilities:
+
+1. **CLI Application** (`finance_tracker.py`) - Command-line interface using Click
+2. **REST API** (`src/api/`) - FastAPI-based web service
 
 **Purpose**: This project serves as a practical example in the Claude Code Learning & Mastery Repository's memory management module (README-6). It demonstrates:
 - Session-specific memory usage (temporary context with `#`)
 - Project-level context preservation (this CLAUDE.md file)
+- **Subdirectory memory hierarchy** (src/CLAUDE.md overrides root conventions)
 - Working with persistent data structures
-- CLI application development patterns
+- CLI and API application development patterns
 
 ## Running the Application
 
-### Basic Usage
+### CLI Application
+
+**Basic Usage:**
 
 ```bash
 # Display help
@@ -27,12 +33,44 @@ python finance_tracker.py add --amount 25.50 --category groceries --description 
 python finance_tracker.py add --amount 100 --category utilities
 ```
 
-### Commands
+**Commands:**
 
 **add**: Add a new financial transaction
 - `--amount` (required, float): Transaction amount (must be > 0)
 - `--category` (required, string): Transaction category (cannot be empty)
 - `--description` (optional, string): Additional transaction details
+
+### REST API Application
+
+**Start the API server:**
+
+```bash
+# From project root
+python -m uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Access the API:**
+- API Base: http://localhost:8000
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+- Health Check: http://localhost:8000/health
+
+**API Usage:**
+
+```bash
+# Create transaction
+curl -X POST http://localhost:8000/api/v1/transactions/ \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 25.50, "category": "groceries", "description": "Weekly shopping"}'
+
+# List all transactions
+curl http://localhost:8000/api/v1/transactions/
+
+# Get specific transaction
+curl http://localhost:8000/api/v1/transactions/1
+```
+
+**API Documentation:** See `src/api/README.md` for comprehensive API documentation.
 
 ## Architecture
 
@@ -42,18 +80,33 @@ python finance_tracker.py add --amount 100 --category utilities
 memory-hands-on/
 ├── .claude/
 │   └── settings.local.json       # Claude Code permissions and MCP config
-├── .gitignore                     # Git ignore rules (excludes transactions.json)
+├── src/                           # API implementation (subdirectory with own CLAUDE.md)
+│   ├── CLAUDE.md                  # API-level memory configuration (overrides root)
+│   ├── README.md                  # Installation and API usage guide
+│   └── api/                       # FastAPI application
+│       ├── __init__.py            # Package initialization
+│       ├── main.py                # FastAPI app entry point
+│       ├── router.py              # Transaction API endpoints
+│       ├── schemas.py             # Pydantic models (v2 syntax)
+│       ├── storage.py             # JSON storage service
+│       ├── requirements.txt       # API dependencies (fastapi, uvicorn)
+│       ├── test_api.py            # API test suite
+│       └── README.md              # Comprehensive API documentation
+├── .gitignore                     # Git ignore rules (excludes *.json data files)
 ├── .python-version                # Python version specification (3.12.10)
 ├── CLAUDE.md                      # This file - project guidance for Claude Code
-├── README.md                      # User-facing project documentation
-├── requirements.txt               # Runtime dependencies (click)
-├── requirements-dev.txt           # Development dependencies (pytest)
-├── finance_tracker.py             # Main application (executable)
-├── test_finance_tracker.py        # Comprehensive test suite (pytest)
-└── transactions.json              # Persistent storage (auto-created, gitignored)
+├── README.md                      # User-facing CLI documentation
+├── requirements.txt               # CLI runtime dependencies (click)
+├── requirements-dev.txt           # CLI development dependencies (pytest)
+├── finance_tracker.py             # CLI application (executable)
+├── test_finance_tracker.py        # CLI test suite (pytest)
+├── transactions.json              # CLI persistent storage (auto-created, gitignored)
+└── api_transactions.json          # API persistent storage (auto-created, gitignored)
 ```
 
 ### Code Organization
+
+#### CLI Application (`finance_tracker.py`)
 
 **FinanceTracker Class**:
 - `__init__()`: Initialize tracker and load existing transactions
@@ -67,6 +120,33 @@ memory-hands-on/
 **ValidationError Exception**: Custom exception for input validation errors
 
 **CLI Functions**: Click-based command-line interface with group and command decorators
+
+#### REST API Application (`src/api/`)
+
+**main.py**: FastAPI application setup
+- App initialization with CORS middleware
+- Router inclusion
+- Health check and root endpoints
+- Structured logging configuration
+
+**router.py**: Transaction API endpoints
+- POST `/api/v1/transactions/` - Create transaction
+- GET `/api/v1/transactions/` - List all transactions
+- GET `/api/v1/transactions/{id}` - Get specific transaction
+- DELETE `/api/v1/transactions/{id}` - Delete transaction
+- Async route handlers with dependency injection
+
+**schemas.py**: Pydantic v2 models
+- `TransactionCreate` - Request validation schema
+- `TransactionResponse` - Response serialization with field_serializer
+- `TransactionListResponse` - List response wrapper
+- **IMPORTANT**: Uses Pydantic v2 syntax (ConfigDict, @field_serializer)
+
+**storage.py**: JSON storage service
+- `TransactionStorage` class for CRUD operations
+- Auto-incrementing ID generation
+- JSON file persistence with error recovery
+- Structured logging for all operations
 
 ### Data Structure
 
@@ -98,6 +178,8 @@ Each transaction is stored as a dictionary:
 
 ### Dependencies
 
+#### CLI Application Dependencies
+
 **Runtime Dependencies:**
 - Python 3.6+ (uses type hints and f-strings)
 - **click**: CLI framework with decorators and options
@@ -110,10 +192,10 @@ Each transaction is stored as a dictionary:
 
 **Installation:**
 ```bash
-# Install runtime dependencies
+# Install CLI runtime dependencies
 pip install -r requirements.txt
 
-# Install development dependencies (includes pytest)
+# Install CLI development dependencies (includes pytest)
 pip install -r requirements-dev.txt
 
 # Or install manually
@@ -122,10 +204,38 @@ pip install pytest   # Development
 ```
 
 **Dependency Files:**
-- `requirements.txt`: Contains runtime dependencies (click>=8.0.0)
-- `requirements-dev.txt`: Contains development dependencies and includes requirements.txt
+- `requirements.txt`: Contains CLI runtime dependencies (click>=8.0.0)
+- `requirements-dev.txt`: Contains CLI development dependencies and includes requirements.txt
+
+#### REST API Dependencies
+
+**Runtime Dependencies:**
+- Python 3.6+ (recommended 3.12.10)
+- **fastapi>=0.109.0**: Web framework with Pydantic v2 support
+- **uvicorn[standard]>=0.27.0**: ASGI server for running FastAPI
+- **pydantic 2.x**: Data validation (included with FastAPI)
+- Standard library: `decimal`, `json`, `logging`, `pathlib`, `datetime`, `typing`
+
+**CRITICAL - Pydantic v2 Compatibility:**
+- This API requires Pydantic v2 (e.g., 2.5.3)
+- Using Pydantic v1 syntax will cause 500 Internal Server Error
+- The `schemas.py` file uses v2 syntax: `ConfigDict` and `@field_serializer`
+
+**Installation:**
+```bash
+# Install API dependencies from project root
+pip install -r src/api/requirements.txt
+
+# Verify Pydantic version
+python -c "import pydantic; print(pydantic.__version__)"  # Should be 2.x.x
+```
+
+**Dependency Files:**
+- `src/api/requirements.txt`: Contains API dependencies (fastapi, uvicorn)
 
 ### Testing
+
+#### CLI Application Tests
 
 **Test Framework**: pytest with comprehensive test coverage
 
@@ -167,6 +277,54 @@ pytest test_finance_tracker.py --cov=finance_tracker --cov-report=term-missing
 - ✅ Data persistence verified
 - ✅ Edge cases covered
 
+#### REST API Tests
+
+**Test Framework**: Custom test runner with assertions
+
+**Test File**: `src/api/test_api.py` - Comprehensive test cases covering:
+- Health check endpoint
+- Root endpoint information
+- Create transactions (with and without description)
+- Validation errors (invalid amount, empty category)
+- List all transactions
+- Get specific transaction by ID
+- Get nonexistent transaction (404 error)
+- Delete transaction
+- Delete nonexistent transaction (404 error)
+
+**Running Tests:**
+```bash
+# Run API tests from project root
+python src/api/test_api.py
+
+# Or run with pytest if pytest-asyncio is installed
+pytest src/api/test_api.py -v
+```
+
+**Test Output:**
+```
+============================================================
+PERSONAL FINANCE TRACKER API - TEST SUITE
+============================================================
+
+✓ Health check endpoint working
+✓ Root endpoint provides API info
+✓ Create transaction with description
+✓ Create transaction without description
+...
+✓ All validation tests passed
+✓ All CRUD operations tested
+
+============================================================
+ALL TESTS PASSED! ✓
+============================================================
+```
+
+**Important Notes:**
+- API tests require the server to NOT be running (tests start their own instance)
+- Tests use FastAPI's TestClient for in-memory testing
+- Temporary test database is cleaned up after each test
+
 ## Claude Code Configuration
 
 ### Permissions (.claude/settings.local.json)
@@ -178,7 +336,19 @@ This project configures specific permissions for Claude Code:
   "permissions": {
     "allow": [
       "Bash(cat:*)",
-      "Bash(python finance_tracker.py:*)"
+      "Bash(python finance_tracker.py:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(pytest:*)",
+      "Bash(pip install:*)",
+      "Bash(curl:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(python -c:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(python test_api_manual.py:*)",
+      "Bash(python src/api/test_api.py:*)",
+      "Bash(python -m uvicorn:*)"
     ]
   },
   "disabledMcpjsonServers": [
@@ -188,8 +358,14 @@ This project configures specific permissions for Claude Code:
 ```
 
 **Permissions Explained:**
-- `Bash(cat:*)`: Allows reading file contents for inspection
-- `Bash(python finance_tracker.py:*)`: Allows running the finance tracker with any arguments
+- `Bash(cat:*)`: Read file contents for inspection
+- `Bash(python finance_tracker.py:*)`: Run CLI finance tracker
+- `Bash(git add:*)` and `Bash(git commit:*)`: Version control operations
+- `Bash(pytest:*)`: Run test suites
+- `Bash(pip install:*)`: Install Python dependencies
+- `Bash(curl:*)`: Test API endpoints
+- `Bash(python -m uvicorn:*)`: Start FastAPI server
+- `Bash(netstat:*)` and `Bash(taskkill:*)`: Process management for API debugging
 - `disabledMcpjsonServers`: Weather MCP server is disabled (not needed for this project)
 
 ### Python Environment
@@ -198,15 +374,16 @@ This project configures specific permissions for Claude Code:
 
 **Setting Up:**
 ```bash
-# Install dependencies
-pip install -r requirements.txt          # Runtime only
-pip install -r requirements-dev.txt      # Runtime + development
+# CLI Application
+pip install -r requirements.txt          # CLI runtime dependencies
+pip install -r requirements-dev.txt      # CLI + development dependencies
+python finance_tracker.py --help         # Run CLI
+pytest test_finance_tracker.py -v        # Test CLI
 
-# Run the application
-python finance_tracker.py --help
-
-# Run tests
-pytest test_finance_tracker.py -v
+# REST API Application
+pip install -r src/api/requirements.txt  # API dependencies (fastapi, uvicorn)
+python -m uvicorn src.api.main:app --reload --port 8000  # Run API
+python src/api/test_api.py               # Test API
 ```
 
 ## Development Workflow

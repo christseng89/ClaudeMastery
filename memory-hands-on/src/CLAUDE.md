@@ -34,28 +34,41 @@ async def create_transaction(
 
 ## Response Models
 
-Always use Pydantic schemas for responses:
+Always use Pydantic v2 schemas for responses:
 
 ```python
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer, ConfigDict
 from decimal import Decimal
 from datetime import datetime
 
 class TransactionResponse(BaseModel):
+    """Response schema with Pydantic v2 syntax."""
+
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     amount: Decimal
     category: str
     transaction_type: str
     date: datetime
 
-    class Config:
-        from_attributes = True
-        json_encoders = {
-            Decimal: lambda v: float(v),
-            datetime: lambda v: v.isoformat()
-        }
+    @field_serializer('amount')
+    def serialize_amount(self, value: Decimal) -> str:
+        """Serialize Decimal to string to preserve precision."""
+        return str(value)
 
+    @field_serializer('date')
+    def serialize_date(self, value: datetime) -> str:
+        """Serialize datetime to ISO format string."""
+        return value.isoformat()
 ```
+
+**IMPORTANT - Pydantic v2 Compatibility:**
+- Use `model_config = ConfigDict(from_attributes=True)` instead of `class Config`
+- Use `@field_serializer` decorators instead of `json_encoders`
+- The old v1 syntax (`json_encoders`) will cause 500 Internal Server Error
+
+
 
 ## Error Handling
 
