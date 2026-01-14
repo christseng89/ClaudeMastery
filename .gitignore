@@ -1,3 +1,4 @@
 nul
 *.db
 tmpclaude-*
+.mcp.json.backup

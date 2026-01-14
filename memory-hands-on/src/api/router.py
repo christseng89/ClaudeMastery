@@ -6,6 +6,7 @@ Follows API-specific conventions from src/CLAUDE.md:
 - Use FastAPI HTTPException
 - Return Pydantic models (not raw dicts)
 - Include operation summaries and response models
+- Convert between Transaction models and Pydantic schemas
 """
 
 import logging
@@ -15,6 +16,7 @@ from typing import List
 
 from .schemas import TransactionCreate, TransactionResponse, TransactionListResponse
 from .storage import TransactionStorage
+from .models import Transaction, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -58,20 +60,20 @@ async def create_transaction(
         HTTPException: 400 if validation fails
     """
     try:
-        # Add transaction to storage
-        transaction_data = storage.add_transaction(
+        # Add transaction to storage (returns Transaction model object)
+        transactionModel = storage.add_transaction(
             amount=transaction.amount,
             category=transaction.category,
             description=transaction.description
         )
 
-        # Convert to response model
+        # Convert Transaction model to Pydantic response schema
         response = TransactionResponse(
-            id=transaction_data['id'],
-            amount=Decimal(transaction_data['amount']),
-            category=transaction_data['category'],
-            description=transaction_data['description'],
-            date=transaction_data['date']
+            id=transactionModel.id,
+            amount=transactionModel.amount,
+            category=transactionModel.category,
+            description=transactionModel.description,
+            date=transactionModel.date
         )
 
         logger.info('Transaction created via API', extra={
@@ -82,7 +84,7 @@ async def create_transaction(
 
         return response
 
-    except ValueError as error:
+    except (ValueError, ValidationError) as error:
         logger.warning('Transaction validation failed', extra={'error': str(error)})
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -108,18 +110,18 @@ async def list_transactions(
     Returns:
         List of all transactions with total count
     """
-    transactions_data = storage.get_all_transactions()
+    transactionsModels = storage.get_all_transactions()
 
-    # Convert to response models
+    # Convert Transaction model objects to Pydantic response schemas
     transactions = [
         TransactionResponse(
-            id=txn['id'],
-            amount=Decimal(txn['amount']),
-            category=txn['category'],
-            description=txn['description'],
-            date=txn['date']
+            id=txn.id,
+            amount=txn.amount,
+            category=txn.category,
+            description=txn.description,
+            date=txn.date
         )
-        for txn in transactions_data
+        for txn in transactionsModels
     ]
 
     response = TransactionListResponse(
@@ -157,21 +159,22 @@ async def get_transaction(
     Raises:
         HTTPException: 404 if transaction not found
     """
-    transaction_data = storage.get_transaction(transaction_id)
+    transactionModel = storage.get_transaction(transaction_id)
 
-    if transaction_data is None:
+    if transactionModel is None:
         logger.warning('Transaction not found via API', extra={'transaction_id': transaction_id})
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f'Transaction {transaction_id} not found'
         )
 
+    # Convert Transaction model to Pydantic response schema
     response = TransactionResponse(
-        id=transaction_data['id'],
-        amount=Decimal(transaction_data['amount']),
-        category=transaction_data['category'],
-        description=transaction_data['description'],
-        date=transaction_data['date']
+        id=transactionModel.id,
+        amount=transactionModel.amount,
+        category=transactionModel.category,
+        description=transactionModel.description,
+        date=transactionModel.date
     )
 
     logger.info('Transaction retrieved via API', extra={'transaction_id': transaction_id})

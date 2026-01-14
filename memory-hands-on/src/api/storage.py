@@ -5,6 +5,7 @@ Follows API-specific conventions from src/CLAUDE.md:
 - Use Python logging module
 - Single quotes for dictionary keys
 - Async operations where beneficial
+- Works with Transaction model objects for clean separation of concerns
 """
 
 import json
@@ -13,6 +14,8 @@ from pathlib import Path
 from decimal import Decimal
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+
+from .models import Transaction, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +36,7 @@ class TransactionStorage:
         logger.info('Transaction storage initialized', extra={'data_file': str(self.data_file)})
 
     def _load_transactions(self) -> None:
-        """Load transactions from JSON file."""
+        """Load transactions from JSON file and convert to Transaction objects."""
         if not self.data_file.exists():
             logger.info('Data file does not exist, starting with empty storage')
             self._transactions = []
@@ -42,15 +45,25 @@ class TransactionStorage:
         try:
             with open(self.data_file, 'r', encoding='utf-8') as file:
                 data = json.load(file)
-                self._transactions = data
+
+                # Convert dictionaries to Transaction objects
+                self._transactions = []
+                for txnData in data:
+                    try:
+                        transaction = Transaction.fromDict(txnData)
+                        self._transactions.append(transaction)
+                    except ValidationError as validationError:
+                        logger.warning('Skipping invalid transaction during load', extra={
+                            'error': str(validationError),
+                            'transaction_data': txnData
+                        })
 
                 # Calculate next ID
                 if self._transactions:
-                    # Handle transactions that might not have 'id' field (backward compatibility)
-                    existing_ids = [txn.get('id', 0) for txn in self._transactions if 'id' in txn]
-                    if existing_ids:
-                        max_id = max(existing_ids)
-                        self._next_id = max_id + 1
+                    existingIds = [txn.id for txn in self._transactions if txn.id is not None]
+                    if existingIds:
+                        maxId = max(existingIds)
+                        self._next_id = maxId + 1
                     else:
                         # No transactions have IDs, start fresh
                         self._transactions = []
@@ -67,10 +80,13 @@ class TransactionStorage:
             self._transactions = []
 
     def _save_transactions(self) -> None:
-        """Save transactions to JSON file."""
+        """Save transactions to JSON file by converting Transaction objects to dictionaries."""
         try:
+            # Convert Transaction objects to dictionaries for JSON serialization
+            transactionsData = [txn.toDict() for txn in self._transactions]
+
             with open(self.data_file, 'w', encoding='utf-8') as file:
-                json.dump(self._transactions, file, indent=2, ensure_ascii=False)
+                json.dump(transactionsData, file, indent=2, ensure_ascii=False)
 
             logger.info('Transactions saved successfully', extra={
                 'transaction_count': len(self._transactions)
@@ -87,7 +103,7 @@ class TransactionStorage:
         amount: Decimal,
         category: str,
         description: str = ''
-    ) -> Dict[str, Any]:
+    ) -> Transaction:
         """
         Add a new transaction to storage.
 
@@ -97,34 +113,35 @@ class TransactionStorage:
             description: Optional transaction details
 
         Returns:
-            Dictionary with transaction data including generated ID
+            Transaction object with generated ID
 
-        Note:
-            Uses single quotes for dictionary keys (API convention)
+        Raises:
+            ValidationError: If transaction data is invalid
         """
-        transaction_id = self._next_id
+        transactionId = self._next_id
         self._next_id += 1
 
-        transaction_data = {
-            'id': transaction_id,
-            'amount': str(amount),  # Store as string to preserve Decimal precision
-            'category': category.strip(),
-            'description': description.strip(),
-            'date': datetime.now().isoformat()
-        }
+        # Create Transaction object (validation happens in constructor)
+        transaction = Transaction(
+            amount=amount,
+            category=category,
+            description=description,
+            transaction_id=transactionId,
+            date=datetime.now()
+        )
 
-        self._transactions.append(transaction_data)
+        self._transactions.append(transaction)
         self._save_transactions()
 
         logger.info('Transaction added', extra={
-            'transaction_id': transaction_id,
+            'transaction_id': transactionId,
             'amount': str(amount),
             'category': category
         })
 
-        return transaction_data
+        return transaction
 
-    def get_transaction(self, transaction_id: int) -> Optional[Dict[str, Any]]:
+    def get_transaction(self, transaction_id: int) -> Optional[Transaction]:
         """
         Get transaction by ID.
 
@@ -132,22 +149,22 @@ class TransactionStorage:
             transaction_id: Transaction unique identifier
 
         Returns:
-            Transaction dictionary or None if not found
+            Transaction object or None if not found
         """
         for transaction in self._transactions:
-            if transaction['id'] == transaction_id:
+            if transaction.id == transaction_id:
                 logger.info('Transaction retrieved', extra={'transaction_id': transaction_id})
                 return transaction
 
         logger.warning('Transaction not found', extra={'transaction_id': transaction_id})
         return None
 
-    def get_all_transactions(self) -> List[Dict[str, Any]]:
+    def get_all_transactions(self) -> List[Transaction]:
         """
         Get all transactions.
 
         Returns:
-            List of all transaction dictionaries
+            List of all Transaction objects
         """
         logger.info('Retrieving all transactions', extra={
             'transaction_count': len(self._transactions)
@@ -165,7 +182,7 @@ class TransactionStorage:
             True if deleted, False if not found
         """
         for index, transaction in enumerate(self._transactions):
-            if transaction['id'] == transaction_id:
+            if transaction.id == transaction_id:
                 self._transactions.pop(index)
                 self._save_transactions()
 

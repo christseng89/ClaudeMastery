@@ -42,17 +42,38 @@
     "date": "2026-01-10T19:17:05.185228"
   },
   {
-    "id": 8,
-    "amount": "25.5",
-    "category": "groceries",
-    "description": "Weekly shopping",
-    "date": "2026-01-10T19:21:56.638902"
-  },
-  {
     "id": 9,
     "amount": "25.5",
     "category": "groceries",
     "description": "Weekly shopping",
     "date": "2026-01-10T19:23:34.095718"
+  },
+  {
+    "id": 10,
+    "amount": "25.5",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-14T15:21:26.915209"
+  },
+  {
+    "id": 11,
+    "amount": "25.5",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-14T15:28:59.584052"
+  },
+  {
+    "id": 12,
+    "amount": "25.5",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-14T15:32:44.364296"
+  },
+  {
+    "id": 13,
+    "amount": "25.5",
+    "category": "groceries",
+    "description": "Weekly shopping",
+    "date": "2026-01-14T15:41:01.840281"
   }
 ]

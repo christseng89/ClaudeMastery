@@ -299,8 +299,36 @@ claude
 
    sequential-thinking · ✔ connected
 
+Can you refactor the code in memory-hands-on/src/api directory to add models. Please use MCP server, sequential_thinking.
+Enhance the models into the test_api.py and test it.
+Update CLAUDE.md and README.md in the memory-hands-on/src/api directory accordingly.
+
+```
+
+#### Test Changes
+
+```cmd
+cd memory-hands-on
+uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+```bash
+start http://localhost:8000/docs
+start http://localhost:8000/health
+
+curl -X POST http://localhost:8000/api/v1/transactions/ \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 25.50, "category": "groceries", "description": "Weekly shopping"}'
+
+curl http://localhost:8000/api/v1/transactions/
+curl http://localhost:8000/api/v1/transactions/8
+curl -X DELETE http://localhost:8000/api/v1/transactions/8
+```
+
+```bash
+claude
 /clear
-/auto-commit      
+/auto-commit 
 ```
 
 ### Configuration

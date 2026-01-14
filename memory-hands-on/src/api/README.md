@@ -8,12 +8,15 @@ This API application helps you manage your personal finances by tracking transac
 
 **Key Features:**
 - RESTful API with FastAPI framework
+- **Clean architecture** with separate layers (models, schemas, storage, router)
+- **Domain models** for business logic validation
 - Precise Decimal arithmetic for financial calculations
 - JSON-based persistent storage (api_transactions.json)
 - Comprehensive input validation with Pydantic schemas
 - Structured logging for production readiness
 - Async route handlers for performance
 - Auto-generated OpenAPI documentation
+- **Comprehensive test suite** (25 tests: 14 model + 11 API)
 
 ## Quick Start
 
@@ -244,18 +247,53 @@ response_data = {
 
 ## Architecture
 
+### Clean Layered Architecture
+
+This API follows a clean separation of concerns with distinct layers:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                     HTTP Layer                           │
+│  router.py - FastAPI endpoints, HTTP handling            │
+└───────────────────────┬─────────────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────────────┐
+│                  Pydantic Schemas                        │
+│  schemas.py - API contracts (request/response)           │
+└───────────────────────┬─────────────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────────────┐
+│                  Domain Models                           │
+│  models.py - Business logic & validation                 │
+└───────────────────────┬─────────────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────────────┐
+│                 Storage Layer                            │
+│  storage.py - JSON persistence                           │
+└─────────────────────────────────────────────────────────┘
+
+Request Flow:
+HTTP Request → Pydantic Schema (API validation)
+            → Transaction Model (business validation)
+            → Storage Layer (persistence)
+            → Transaction Model (business object)
+            → Pydantic Schema (API response)
+            → HTTP Response
+```
+
 ### Project Structure
 
 ```
 src/api/
 ├── __init__.py              # Package initialization
 ├── main.py                  # FastAPI application entry point
-├── router.py                # Transaction API endpoints
-├── schemas.py               # Pydantic request/response models
-├── storage.py               # JSON storage service
+├── router.py                # Transaction API endpoints (HTTP layer)
+├── schemas.py               # Pydantic request/response models (API contracts)
+├── models.py                # Transaction domain model (business logic) ✨ NEW
+├── storage.py               # JSON storage service (persistence)
 ├── requirements.txt         # API dependencies
-├── test_api.py             # Comprehensive test suite
-└── README.md               # This file
+├── test_api.py              # Comprehensive test suite (25 tests)
+└── README.md                # This file
 ```
 
 ### Code Organization
@@ -266,21 +304,31 @@ src/api/
 - Router inclusion
 - Health check and root endpoints
 
-**router.py**: Transaction endpoints
-- All CRUD operations
+**router.py**: Transaction endpoints (HTTP layer)
+- All CRUD operations (POST, GET, DELETE)
 - Async route handlers
 - Dependency injection for storage
-- Comprehensive error handling
+- Converts between Pydantic schemas and Transaction models
+- HTTP exception handling
 
-**schemas.py**: Pydantic models
-- TransactionCreate (request)
-- TransactionResponse (response)
-- TransactionListResponse
-- ErrorResponse
-- Field validation
+**schemas.py**: Pydantic models (API contracts)
+- TransactionCreate (request validation)
+- TransactionResponse (response serialization)
+- TransactionListResponse (list wrapper)
+- ErrorResponse (error format)
+- Field-level validation and serialization
 
-**storage.py**: JSON storage service
-- Load/save transactions
+**models.py**: Domain models (business logic) ✨ NEW
+- Transaction class with business validation
+- ValidationError custom exception
+- Amount validation (must be positive Decimal)
+- Category validation (non-empty, trimmed)
+- Serialization methods (toDict/fromDict)
+- Business logic separate from API concerns
+
+**storage.py**: JSON storage service (persistence)
+- Works with Transaction model objects
+- Load/save transactions to JSON
 - Auto-increment ID generation
 - Transaction CRUD operations
 - Structured logging
@@ -346,35 +394,102 @@ Unexpected server error (logged automatically)
 
 ## Testing
 
-### Test Suite
+### Comprehensive Test Suite (25 Tests)
 
-Run the comprehensive test suite:
+The test suite includes both **unit tests** (models) and **integration tests** (API endpoints):
+
 ```bash
 python src/api/test_api.py
 ```
 
-**Tests Include:**
-- Health check and root endpoint
-- Create transactions (with and without description)
-- Validation errors (invalid amount, empty category)
-- List all transactions
-- Get specific transaction
-- Get nonexistent transaction (404)
-- Delete transaction
-- Delete nonexistent transaction (404)
+#### Model Unit Tests (14 tests)
 
-**Expected Output:**
+Tests business logic independently of HTTP layer:
+
+**Creation Tests:**
+- ✅ Valid transaction creation
+- ✅ Transaction creation with ID and custom date
+
+**Validation Tests:**
+- ✅ Negative amount rejection
+- ✅ Zero amount rejection
+- ✅ Empty category rejection
+- ✅ Whitespace-only category rejection
+
+**Data Conversion Tests:**
+- ✅ String to Decimal conversion
+
+**Serialization Tests:**
+- ✅ `toDict()` - Transaction to dictionary
+- ✅ `fromDict()` - Dictionary to Transaction
+- ✅ Round-trip serialization (data integrity)
+
+**Equality Tests:**
+- ✅ Transaction equality comparison
+
+**Edge Case Tests:**
+- ✅ Large amount handling ($999,999,999.99)
+- ✅ Unicode characters (Japanese: 食料品, Café ☕)
+- ✅ Whitespace trimming
+
+#### API Integration Tests (11 tests)
+
+Tests HTTP endpoints with FastAPI TestClient:
+
+- ✅ Health check and root endpoint
+- ✅ Create transactions (with and without description)
+- ✅ Validation errors (invalid amount, empty category)
+- ✅ List all transactions
+- ✅ Get specific transaction
+- ✅ Get nonexistent transaction (404)
+- ✅ Delete transaction
+- ✅ Delete nonexistent transaction (404)
+
+#### Test Output
+
 ```
 ============================================================
-PERSONAL FINANCE TRACKER API - TEST SUITE
+PERSONAL FINANCE TRACKER - COMPREHENSIVE TEST SUITE
 ============================================================
 
-[... test results ...]
+============================================================
+SECTION 1: TRANSACTION MODEL TESTS
+============================================================
+
+[... 14 model tests ...]
+
+============================================================
+MODEL TESTS COMPLETE: 14 tests passed ✓
+============================================================
+
+============================================================
+SECTION 2: API ENDPOINT TESTS
+============================================================
+
+[... 11 API tests ...]
+
+============================================================
+API TESTS COMPLETE: 11 tests passed ✓
+============================================================
 
 ============================================================
 ALL TESTS PASSED! ✓
 ============================================================
+
+Test Summary:
+  • Model Tests:    14 passed
+  • API Tests:      11 passed
+  • Total Tests:    25 passed
+
+The Personal Finance Tracker is working correctly.
+All model business logic and API endpoints tested successfully.
 ```
+
+#### Test Naming Conventions
+
+- **Test functions**: `snake_case` (pytest convention)
+- **Internal variables**: `camelCase` (user preference from CLAUDE.md)
+- **Descriptive names**: `test_transaction_validation_negative_amount()`
 
 ### Manual Testing
 
@@ -539,6 +654,7 @@ Part of the Claude Code Learning & Mastery Repository.
 ---
 
 **API Version:** 1.0.0
-**Last Updated:** 2026-01-10
+**Last Updated:** 2026-01-14 (Added models.py domain layer + 14 model unit tests)
 **Framework:** FastAPI
 **Python Version:** 3.6+
+**Architecture:** Clean layered architecture (models, schemas, storage, router)
