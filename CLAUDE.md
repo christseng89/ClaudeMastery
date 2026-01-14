@@ -466,6 +466,33 @@ The repository includes MCP (Model Context Protocol) server configuration in `.m
      - Form submission and workflow automation
      - Dynamic content rendering and capture
 
+3. **Sequential Thinking MCP Server** - Provides structured, step-by-step reasoning capabilities
+   - **Configuration**: `npx -y @modelcontextprotocol/server-sequential-thinking`
+   - **Tool:** `sequential_thinking` - Facilitates detailed thinking process for problem-solving
+   - **Capabilities:**
+     - Break complex problems into manageable steps
+     - Revise and refine thoughts as understanding deepens
+     - Branch into alternative reasoning paths
+     - Track thought progression with indexing
+     - Support iterative refinement and hypothesis validation
+   - **Parameters:**
+     - `thought` (string) - Current thinking step content
+     - `nextThoughtNeeded` (boolean) - Whether another step is needed
+     - `thoughtNumber` (integer) - Current thought index
+     - `totalThoughts` (integer) - Estimated total steps needed
+     - `isRevision` (boolean) - Marks thought as revision
+     - `revisesThought` (integer) - Which thought is being revised
+     - `branchFromThought` (integer) - Branching point for alternative paths
+     - `branchId` (string) - Identifier for reasoning branch
+   - **Common Use Cases:**
+     - Complex problem decomposition and analysis
+     - Planning with room for course correction
+     - Exploratory reasoning with multiple approaches
+     - Maintaining context over multi-step reasoning
+     - Debugging and root cause analysis
+   - **Optional Configuration:**
+     - `DISABLE_THOUGHT_LOGGING=true` - Disable logging of thought information
+
 **Usage Examples:**
 ```python
 # Weather tools
@@ -476,6 +503,35 @@ mcp__weather__get-alerts(state="NY")  # New York weather alerts
 # Navigate to a page and take screenshot
 # Fill forms and click buttons
 # Extract data from rendered pages
+
+# Sequential thinking tool - structured problem-solving
+# Example: Breaking down a complex architectural decision
+sequential_thinking({
+    "thought": "Need to choose between monolithic vs microservices architecture",
+    "thoughtNumber": 1,
+    "totalThoughts": 5,
+    "nextThoughtNeeded": True
+})
+
+# Example: Revising a previous thought with new information
+sequential_thinking({
+    "thought": "Actually, given the team size of 3, microservices adds unnecessary complexity",
+    "thoughtNumber": 3,
+    "totalThoughts": 5,
+    "isRevision": True,
+    "revisesThought": 2,
+    "nextThoughtNeeded": True
+})
+
+# Example: Exploring an alternative approach
+sequential_thinking({
+    "thought": "Alternative: Start with modular monolith for easier refactoring later",
+    "thoughtNumber": 4,
+    "totalThoughts": 6,
+    "branchFromThought": 2,
+    "branchId": "alternative-architecture",
+    "nextThoughtNeeded": True
+})
 ```
 
 **Adding New MCP Servers:**
