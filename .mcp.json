@@ -8,18 +8,12 @@
     },
     "puppeteer-mcp-server": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-puppeteer"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
     },
     "sequential-thinking": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
       "env": {
         "DISABLE_THOUGHT_LOGGING": "true"
       },
