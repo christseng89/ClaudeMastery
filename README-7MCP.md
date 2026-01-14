@@ -397,5 +397,49 @@ claude
 
 /clear
 /auto-commit 
+
+Review the github repository for PR and issues. github user is firstlink and repository is mcp-server. Please use github mcp server tools to perform this operation
+
 quit
+```
+
+## MCP Server with Github - Auth
+
+<https://github.com/settings/profile> -> Developer settings ->
+    Personal access tokens -> Fine-grained tokens -> Generate new token
+    - Token name: ClaudeMastery
+    - Expiration: No expiration
+    - Only select repositories: ClaudeMastery
+    - Add permissions: Read and write access to **Contents**, **Pull requests**, and **Issues**
+    -> Generate token -> Copy the token
+
+```cmd
+npm install -g dotenv-cli
+```
+
+```edit .env
+GITHUB_PERSONAL_ACCESS_TOKEN=your_personal_access_token_here
+```
+
+```json edit .mcp.json
+
+{
+  "mcpServers": {
+    "github": {
+      "type": "stdio",
+      "command": "dotenv",
+      "args": ["run", "uvx", "mcp-server-git"]
+    }
+  }
+}
+
+```
+
+```bash
+claude
+/mcp
+    github · ✔ connected
+
+/clear
+/auto-commit
 ```

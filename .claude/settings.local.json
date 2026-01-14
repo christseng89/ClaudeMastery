@@ -33,7 +33,14 @@
       "mcp__github__git_diff_unstaged",
       "mcp__github__git_log",
       "mcp__github__git_add",
-      "mcp__github__git_commit"
+      "mcp__github__git_commit",
+      "Bash(gh --version:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh repo view:*)",
+      "Bash(git fetch:*)",
+      "Bash(where:*)",
+      "Bash(dotenv -e .env -- uvx:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
