@@ -5,6 +5,13 @@
       "args": [
         "d:\\development\\mcp-servers\\quickstart-resources\\weather-server-typescript\\build\\index.js"
       ]
+    },
+    "puppeteer-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ]
     }
   }
 }

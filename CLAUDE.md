@@ -440,18 +440,51 @@ When contributing, align with these themes and maintain the educational focus.
 
 ## MCP Server Integration
 
-The repository includes MCP (Model Context Protocol) server configuration in `.claude/settings.local.json`:
+The repository includes MCP (Model Context Protocol) server configuration in `.mcp.json`:
 
 **Enabled Servers:**
-- **MCP US Weather Server** - Provides weather forecast and alert tools
 
-**Usage:**
-```
-mcp__weather__get-forecast(latitude, longitude)
-mcp__weather__get-alerts(state)
+1. **MCP US Weather Server** - Provides weather forecast and alert tools
+   - **Configuration**: Node.js server running from local build
+   - **Tools:**
+     - `mcp__weather__get-forecast(latitude, longitude)` - Get weather forecast for coordinates
+     - `mcp__weather__get-alerts(state)` - Get weather alerts for US states (2-letter code)
+
+2. **Puppeteer MCP Server** - Provides headless browser automation capabilities
+   - **Configuration**: `npx -y @modelcontextprotocol/server-puppeteer`
+   - **Capabilities:**
+     - Take screenshots of web pages
+     - Navigate to URLs and interact with pages
+     - Click elements and fill forms
+     - Extract page content and DOM elements
+     - Execute JavaScript in browser context
+     - Full headless Chrome/Chromium control
+   - **Common Use Cases:**
+     - Web scraping and data extraction
+     - Automated testing and quality assurance
+     - Screenshot generation for documentation
+     - Form submission and workflow automation
+     - Dynamic content rendering and capture
+
+**Usage Examples:**
+```python
+# Weather tools
+mcp__weather__get-forecast(latitude=40.7128, longitude=-74.0060)  # NYC forecast
+mcp__weather__get-alerts(state="NY")  # New York weather alerts
+
+# Puppeteer tools (exact tool names depend on server implementation)
+# Navigate to a page and take screenshot
+# Fill forms and click buttons
+# Extract data from rendered pages
 ```
 
-When adding new MCP servers, update `settings.local.json` and document their tools.
+**Adding New MCP Servers:**
+1. Use `claude mcp add <server-name> "<command>" --scope project`
+2. Update this documentation section with server details
+3. Restart Claude Code to load the new server
+4. Test the server tools to verify functionality
+
+When adding new MCP servers, update `.mcp.json` and document their tools in this section.
 
 ## Project Goals and Philosophy
 

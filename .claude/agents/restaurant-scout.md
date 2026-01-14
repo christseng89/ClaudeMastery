@@ -1,6 +1,17 @@
 ---
 name: restaurant-scout
-description: Use this agent when the user requests restaurant recommendations, dining suggestions, food experiences, or asks about places to eat at a specific location. Also use when the user mentions hunger, meals, cuisine types, or asks 'where should I eat'. This agent should be invoked when planning trips and the user wants to know about food options, local culinary scenes, or when they ask about activities and attractions that could include dining experiences.\n\nExamples:\n- User: 'I'm visiting Paris next month, what are some good restaurants?'\n  Assistant: 'Let me use the restaurant-scout agent to find excellent dining options in Paris for you.'\n\n- User: 'What should I do in Tokyo?'\n  Assistant: 'I'll use the restaurant-scout agent to recommend top restaurants, scenic locations, and fun activities in Tokyo.'\n\n- User: 'I'm hungry and in Barcelona, any suggestions?'\n  Assistant: 'I'm going to launch the restaurant-scout agent to find the best dining spots near you in Barcelona.'
+description: |
+  Use this agent when the user requests restaurant recommendations, dining suggestions, food experiences, or asks about places to eat at a specific location. Also use when the user mentions hunger, meals, cuisine types, or asks 'where should I eat'. This agent should be invoked when planning trips and the user wants to know about food options, local culinary scenes, or when they ask about activities and attractions that could include dining experiences.
+
+  Examples:
+  - User: 'I'm visiting Paris next month, what are some good restaurants?'
+    Assistant: 'Let me use the restaurant-scout agent to find excellent dining options in Paris for you.'
+
+  - User: 'What should I do in Tokyo?'
+    Assistant: 'I'll use the restaurant-scout agent to recommend top restaurants, scenic locations, and fun activities in Tokyo.'
+
+  - User: 'I'm hungry and in Barcelona, any suggestions?'
+    Assistant: 'I'm going to launch the restaurant-scout agent to find the best dining spots near you in Barcelona.'
 model: sonnet
 ---
 
