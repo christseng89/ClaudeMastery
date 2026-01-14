@@ -32,7 +32,8 @@
       "mcp__github__git_status",
       "mcp__github__git_diff_unstaged",
       "mcp__github__git_log",
-      "mcp__github__git_add"
+      "mcp__github__git_add",
+      "mcp__github__git_commit"
     ]
   },
   "enableAllProjectMcpServers": true,
