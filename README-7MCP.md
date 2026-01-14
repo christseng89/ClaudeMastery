@@ -442,4 +442,9 @@ claude
 
 /clear
 /auto-commit
+
+Can you create a feature branch for current GitHub project. Use the user as "christseng89" and feature branch name as "first-commit-mcp-server"
+
+/clear
+/auto-commit
 ```

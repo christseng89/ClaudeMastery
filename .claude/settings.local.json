@@ -40,7 +40,9 @@
       "Bash(gh repo view:*)",
       "Bash(git fetch:*)",
       "Bash(where:*)",
-      "Bash(dotenv -e .env -- uvx:*)"
+      "Bash(dotenv -e .env -- uvx:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
