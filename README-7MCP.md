@@ -378,3 +378,24 @@ sequential_thinking({
 - Supports exploring multiple solution paths
 - Improves problem-solving for complex scenarios
 - Makes the AI's thought process transparent and auditable
+
+## MCP Server with Github - No Auth
+
+<https://github.com/modelcontextprotocol/servers>
+<https://github.com/modelcontextprotocol/servers/tree/main/src/git>
+
+
+```bash
+claude
+claude mcp add github --scope project -- uvx mcp-server-git
+quit
+
+claude
+/mcp
+
+   github · ✔ connected 
+
+/clear
+/auto-commit 
+quit
+```

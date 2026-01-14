@@ -27,7 +27,12 @@
       "mcp__puppeteer-mcp-server__puppeteer_evaluate",
       "WebFetch(domain:github.com)",
       "Bash(npx:*)",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(git rm:*)",
+      "mcp__github__git_status",
+      "mcp__github__git_diff_unstaged",
+      "mcp__github__git_log",
+      "mcp__github__git_add"
     ]
   },
   "enableAllProjectMcpServers": true,
