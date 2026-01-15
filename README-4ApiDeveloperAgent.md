@@ -186,19 +186,19 @@ claude
   ---
   📊 API Endpoints Summary
 
-  | Method         | Endpoint                 | Description                |
-  |----------------|--------------------------|----------------------------|
-  | Authentication |                          |                            |
-  | POST           | /api/v1/auth/register    | Register new user          |
-  | POST           | /api/v1/auth/login       | Login & get JWT tokens     |
-  | GET            | /api/v1/auth/me          | Get current user           |
-  | Expenses       |                          |                            |
-  | POST           | /api/v1/expenses         | Create expense             |
-  | GET            | /api/v1/expenses         | List (paginated, filtered) |
-  | GET            | /api/v1/expenses/{id}    | Get specific expense       |
-  | PUT            | /api/v1/expenses/{id}    | Update expense             |
-  | DELETE         | /api/v1/expenses/{id}    | Delete (soft delete)       |
-  | GET            | /api/v1/expenses/summary | Get analytics              |
+| Method         | Endpoint                 | Description                |
+|----------------|--------------------------|----------------------------|
+| Authentication |                          |                            |
+| POST           | /api/v1/auth/register    | Register new user          |
+| POST           | /api/v1/auth/login       | Login & get JWT tokens     |
+| GET            | /api/v1/auth/me          | Get current user           |
+| Expenses       |                          |                            |
+| POST           | /api/v1/expenses         | Create expense             |
+| GET            | /api/v1/expenses         | List (paginated, filtered) |
+| GET            | /api/v1/expenses/{id}    | Get specific expense       |
+| PUT            | /api/v1/expenses/{id}    | Update expense             |
+| DELETE         | /api/v1/expenses/{id}    | Delete (soft delete)       |
+| GET            | /api/v1/expenses/summary | Get analytics              |
 
   ---
   🧪 Test Results

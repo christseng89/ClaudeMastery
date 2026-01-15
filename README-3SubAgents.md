@@ -222,7 +222,7 @@ Source:
 ### 🎯 例子 3：為什麼這比「單一 Agent」強？
 
 | 問題         | 單一 Claude | Subagents |
-| ------------ | ----------- | --------- |
+|--------------|-------------|-----------|
 | Context 過長 | ❌          | ✅        |
 | 輸出穩定性   | ❌          | ✅        |
 | 可重複使用   | ❌          | ✅        |
@@ -388,12 +388,12 @@ claude
   ---
   Agent Storage Locations
 
-  | Type     | Location                   | Scope                 |
-  |----------|----------------------------|-----------------------|
-  | Project  | .claude/agents/*.md        | Current project only  |
-  | User     | ~/.claude/agents/*.md      | All your projects     |
-  | Plugin   | Plugin's agents/ directory | When plugin installed |
-  | Built-in | Internal to Claude Code    | Always available      |
+| Type     | Location                   | Scope                 |
+|----------|----------------------------|-----------------------|
+| Project  | .claude/agents/*.md        | Current project only  |
+| User     | ~/.claude/agents/*.md      | All your projects     |
+| Plugin   | Plugin's agents/ directory | When plugin installed |
+| Built-in | Internal to Claude Code    | Always available      |
 
   ---
   How to Invoke Agents
@@ -476,13 +476,13 @@ claude
   ---
   Quick Comparison
 
-  | Method    | Execution  | Use Case             |
-  |-----------|------------|----------------------|
-  | Automatic | Sequential | General workflows    |
-  | Explicit  | Sequential | Specific tasks       |
-  | Chaining  | Sequential | Multi-step processes |
-  | Worktrees | Parallel   | Separate features    |
-  | Resumable | Spans time | Long analysis        |
+| Method    | Execution  | Use Case             |
+|-----------|------------|----------------------|
+| Automatic | Sequential | General workflows    |
+| Explicit  | Sequential | Specific tasks       |
+| Chaining  | Sequential | Multi-step processes |
+| Worktrees | Parallel   | Separate features    |
+| Resumable | Spans time | Long analysis        |
 
   ---
   Your Current Setup
@@ -558,13 +558,13 @@ claude
 
 ### 中文摘要
 
-| 方法          | 執行方式 | 適用場景     |
-|---------------|----------|--------------|
-| 自動委派      | 順序執行 | 一般工作流程 |
-| 明確指定      | 順序執行 | 精準任務     |
-| 串接          | 順序執行 | 多階段流程   |
-| Worktrees     | 平行     | 多功能並行   |
-| 可恢復        | 跨時間   | 長時間分析   |
+| 方法      | 執行方式 | 適用場景     |
+|-----------|----------|--------------|
+| 自動委派  | 順序執行 | 一般工作流程 |
+| 明確指定  | 順序執行 | 精準任務     |
+| 串接      | 順序執行 | 多階段流程   |
+| Worktrees | 平行     | 多功能並行   |
+| 可恢復    | 跨時間   | 長時間分析   |
 
 ## Run Agents Sequential
 
