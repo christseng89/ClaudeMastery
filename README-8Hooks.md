@@ -110,3 +110,81 @@ sequenceDiagram
 这正是 **AI Agent 治理层（Governance Layer）** 的核心设计模式。
 
 ---
+
+## Hooks - Format a Typescript
+
+```bash
+mkdir -p demo/hooks
+
+cat << 'EOF' > demo/hooks/demo.ts
+const user={name:"John Doe",age:30,email:"john@example.com"};function processUser(userData:any){if(userData.name&&userData.age){console.log(`Processing user: ${userData.name}`);return{...userData,processed:true,timestamp:Date.now(),};}else{throw new Error("Invalid user data");}}const result=processUser(user);console.log(result);
+EOF
+```
+
+```bash
+claude
+Add a comment at the beginning of demo.ts in demo/hooks.
+```
+
+```bash
+mkdir -p ~/.claude/scripts
+cat << 'EOF' > ~/.claude/scripts/format-typescript.sh
+#!/bin/bash
+# TypeScript formatting hook script
+
+# Read JSON input from Claude Code
+input_json=$(cat)
+
+# Extract file path from the JSON input using jq
+file_path=$(echo "$input_json" | jq -r '.tool_input.file_path // empty')
+
+# Check if we got a valid file path
+if [[ -z "$file_path" ]]; then
+  exit 0
+fi
+
+# Check if the file is a TypeScript file
+if [[ "$file_path" =~ \.(ts|tsx)$ ]]; then
+  # Check if prettier is installed
+  if ! command -v prettier &> /dev/null; then
+    echo "Warning: prettier is not installed. Install with: npm install -g prettier" >&2
+    exit 1
+  fi
+
+  # Check if file exists
+  if [[ ! -f "$file_path" ]]; then
+    echo "Warning: File $file_path does not exist" >&2
+    exit 1
+  fi
+
+  # Run prettier on the TypeScript file
+  if prettier --write "$file_path" 2>/dev/null; then
+    echo "✅ Formatted TypeScript file: $file_path"
+    exit 0
+  else
+    echo "❌ Error: Failed to format $file_path with prettier" >&2
+    exit 1
+  fi
+else
+  # Not a TypeScript file, just exit successfully
+  exit 0
+fi
+EOF
+
+chmod +x ~/.claude/scripts/format-typescript.sh
+```
+
+```bash
+claude
+/hooks
+    2.  PostToolUse - After tool execution 
+    1. + Add new matcher… 
+        Write|Edit|MultiEdit  
+
+    1. + Add new hook…
+        ~/.claude/scripts/format-typescript.sh
+
+    2. User settings          Checked in at ~\.claude\settings.json
+
+Add a log at the end of the file demo.ts in the demo\hooks directory
+```
