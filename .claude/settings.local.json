@@ -42,11 +42,26 @@
       "Bash(where:*)",
       "Bash(dotenv -e .env -- uvx:*)",
       "Bash(git checkout:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm install:*)",
+      "Bash(prettier --write:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "MCP US Weather Server - node"
-  ]
+  ],
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/format-typescript.sh"
+          }
+        ]
+      }
+    ]
+  }
 }

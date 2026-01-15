@@ -177,14 +177,45 @@ chmod +x ~/.claude/scripts/format-typescript.sh
 ```bash
 claude
 /hooks
-    2.  PostToolUse - After tool execution 
-    1. + Add new matcher… 
-        Write|Edit|MultiEdit  
+    2.  PostToolUse - After tool execution
+    1. + Add new matcher…
+        Write|Edit|MultiEdit
 
     1. + Add new hook…
         ~/.claude/scripts/format-typescript.sh
 
     2. User settings          Checked in at ~\.claude\settings.json
 
+```
+
+**Correct hooks configuration format in `.claude/settings.local.json`:**
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/format-typescript.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Key Points:**
+
+- `matcher` must be a **string** (e.g., `"Write|Edit|MultiEdit"`) not an object
+- `hooks` must be an **array** of hook objects, each with `type` and `command` fields
+- The hook will trigger after any Write, Edit, or MultiEdit tool is used
+- The script receives JSON input via stdin containing tool information including the file path
+
+```bash
+claude
 Add a log at the end of the file demo.ts in the demo\hooks directory
 ```
