@@ -184,7 +184,7 @@ claude
     1. + Add new hook…
         ~/.claude/scripts/format-typescript.sh
 
-    2. User settings          Checked in at ~\.claude\settings.json
+    3. User settings             Saved in at ~/.claude/settings.json
 
 ```
 
@@ -218,4 +218,54 @@ claude
 ```bash
 claude
 Add a log at the end of the file demo.ts in the demo\hooks directory
+```
+
+## Hooks - Activity Logger
+
+```bash
+mkdir -p ~/.claude/logs
+
+cat << 'EOF' > ~/.claude/scripts/activity-logger.sh
+#!/bin/bash
+# Activity logging hook - tracks all Claude Code operations
+
+# Read JSON input
+input_json=$(cat)
+
+# Extract relevant information
+tool_name=$(echo "$input_json" | jq -r '.tool_name // "unknown"')
+file_path=$(echo "$input_json" | jq -r '.tool_input.file_path // "no-file"')
+project_dir=$(echo "$input_json" | jq -r '.cwd // "unknown"')
+timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+# Log to daily file
+log_file="$HOME/.claude/logs/$(date '+%Y-%m-%d').log"
+echo "[$timestamp] TOOL: $tool_name | FILE: $file_path | PROJECT: $project_dir" >> "$log_file"
+
+# Provide user feedback
+echo "📝 Logged: $tool_name operation"
+
+exit 0
+EOF
+
+chmod +x ~/.claude/scripts/activity-logger.sh
+```
+
+```bash
+claude
+/hooks
+    1.  PreToolUse - Before tool execution
+    1. + Add new matcher…
+        *
+    1. + Add new hook…
+        ~/.claude/scripts/activity-logger.sh
+    3. User settings             Saved in at ~/.claude/settings.json
+
+Update this hook to settings.local.json
+Refer to the README-8Hooks.md in section Hooks - Activity Logger.  The log was not written to the ~/.claude/logs folder.  Fix it.   
+
+quit
+
+claude
+Please add a console.log to demo.ts that prints "Testing activity logger"
 ```

@@ -44,7 +44,9 @@
       "Bash(git checkout:*)",
       "Bash(git push:*)",
       "Bash(npm install:*)",
-      "Bash(prettier --write:*)"
+      "Bash(prettier --write:*)",
+      "Bash(~/.claude/logs/test.log)",
+      "Bash(~/.claude/scripts/activity-logger.sh)"
     ]
   },
   "enableAllProjectMcpServers": true,
@@ -52,6 +54,17 @@
     "MCP US Weather Server - node"
   ],
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/activity-logger.sh"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit",
