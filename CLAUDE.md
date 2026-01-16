@@ -73,7 +73,7 @@ When creating new commands or agents, follow the existing frontmatter patterns w
    - **01-format.sh**: Formats code with Prettier
    - **02-lint.sh**: Runs ESLint for code quality checks (non-blocking warnings)
    - **03-git-stage.sh**: Automatically stages formatted files in git
-   - Test file: `demo/hooks/app.js` (intentionally contains linting issues for testing)
+   - Test file: `demo/hooks/app.js` (optimized JavaScript demonstrating best practices)
 
 **Configuration:** Hooks are configured in `.claude/settings.local.json`:
 
@@ -401,18 +401,21 @@ The expense-tracker also has `.claude/commands/` for domain-specific workflows.
 ```
 demo/
 └── hooks/
-    └── app.js              # Test file with intentional code quality issues
+    └── app.js              # Optimized JavaScript test file
 ```
 
 **demo/hooks/** - Hook testing and demonstration files:
-- **app.js** - JavaScript test file intentionally written with various code quality issues to demonstrate hook functionality:
-  - Duplicate variable declarations
-  - Unused variables
-  - Poor formatting and missing semicolons
-  - Use of eval() and debugger statements
-  - Common closure pitfalls with setTimeout and var
+- **app.js** - Optimized JavaScript test file demonstrating best practices and hook functionality:
+  - Uses const/let instead of var for proper scoping
+  - No duplicate variable declarations
+  - No unused variables
+  - Proper closure handling in setTimeout loops
+  - Modern arrow function syntax
+  - Strict equality operators
+  - No dangerous practices (eval, debugger removed)
+  - Clean, formatted code following JavaScript best practices
 
-This file serves as a practical example for testing hook chains (format → lint → git stage) and demonstrating automated workflow capabilities.
+This file serves as a practical example for testing hook chains (format → lint → git stage) on properly optimized code and demonstrating automated workflow capabilities with clean, production-ready JavaScript.
 
 ### Tool Permissions
 

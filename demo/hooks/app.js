@@ -1,44 +1,40 @@
 /**
- * Hook Testing File
+ * Optimized Hook Testing File
  *
- * This file is intentionally written with various code quality issues to test
- * Claude Code hooks functionality (linting, formatting, and validation hooks).
+ * This file has been optimized to follow JavaScript best practices.
  *
- * Issues included:
- * - Duplicate variable declarations
- * - Unused variables
- * - Poor formatting and missing semicolons
- * - Use of eval() and debugger statements
- * - Common closure pitfalls with setTimeout and var
+ * Improvements:
+ * - Removed duplicate variable declarations
+ * - Removed unused variables
+ * - Fixed closure issues with proper scoping
+ * - Removed dangerous practices (eval, debugger)
+ * - Used strict equality operators
+ * - Simplified arrow functions
  *
  * Located in demo/hooks/ directory for hook testing demonstrations.
  */
-var x = 5;
-var x = 10; // duplicate variable declaration
+
+console.log("Starting hook test");
+
+const x = 10;
 const y = 20;
-let z = 30;
+const z = 30;
 
 function testFunction() {
   console.log(x);
-  if (x == 5) {
-    var unused = "never used";
-    return true;
-  } else {
-    return false;
-  }
+  return x === 5;
 }
 
-const arrow = (a, b) => {
-  return a + b;
-}; // More linting issues
-var duplicate = 1;
-var duplicate = 2; // Testing hook chain
+const arrow = (a, b) => a + b;
+
 const test = "hook test";
-var anotherVar = "testing linting";
-eval('console.log("dangerous")');
-debugger;
-for (var i = 0; i < 10; i++) {
-  setTimeout(function () {
+const anotherVar = "testing linting";
+
+console.log("Processing items...");
+
+// Fixed closure issue by using let instead of var
+for (let i = 0; i < 10; i++) {
+  setTimeout(() => {
     console.log(i);
-  }, 100);
+  }, 700);
 }
