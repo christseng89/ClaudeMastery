@@ -103,8 +103,6 @@ When creating new commands or agents, follow the existing frontmatter patterns w
 - Log to dedicated directories with appropriate permissions
 - Restart Claude Code after modifying hook configuration
 
-**Demo Location:** `demo/hooks/` contains test TypeScript files for hook demonstration.
-
 For comprehensive hook documentation, patterns, and examples, see **README-8Hooks.md**.
 
 ### Example Project: expense-tracker
@@ -354,8 +352,6 @@ Follow this style: start with action verb (Add, Fix, Update, Refactor), be speci
 - **CLAUDE.md** - This file (project guidance)
 - **.claude/** - Claude Code configuration
 - **expense-tracker/** - Working example project
-- **demo/** - Demonstration files for testing hooks and features
-  - **hooks/** - TypeScript demo files for hook testing
 - **Resources/** - Supplementary learning materials
 - **Travel Examples/** - Real-world application demonstrations
 
