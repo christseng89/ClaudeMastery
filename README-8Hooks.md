@@ -226,30 +226,52 @@ Add a log at the end of the file demo.ts in the demo\hooks directory
 mkdir -p ~/.claude/logs
 
 cat << 'EOF' > ~/.claude/scripts/activity-logger.sh
-#!/bin/bash
-# Activity logging hook - tracks all Claude Code operations
+#!/usr/bin/env bash
 
-# Read JSON input
-input_json=$(cat)
+# Create log directory
+log_dir="$HOME/.claude/logs"
+mkdir -p "$log_dir"
 
-# Extract relevant information
-tool_name=$(echo "$input_json" | jq -r '.tool_name // "unknown"')
-file_path=$(echo "$input_json" | jq -r '.tool_input.file_path // "no-file"')
-project_dir=$(echo "$input_json" | jq -r '.cwd // "unknown"')
-timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+# Read stdin to temp file
+temp_file="/tmp/claude-hook-$$.json"
+cat > "$temp_file"
+
+# Try to parse with jq if available
+if command -v jq &> /dev/null; then
+    tool_name=$(jq -r '.tool_name // "unknown"' "$temp_file" 2>/dev/null || echo "unknown")
+    file_path=$(jq -r '.tool_input.file_path // .tool_input.path // "no-file"' "$temp_file" 2>/dev/null || echo "no-file")
+    project_dir=$(jq -r '.cwd // "unknown"' "$temp_file" 2>/dev/null || echo "unknown")
+else
+    # Fallback without jq
+    tool_name="unknown"
+    file_path="no-file"
+    project_dir="unknown"
+fi
 
 # Log to daily file
-log_file="$HOME/.claude/logs/$(date '+%Y-%m-%d').log"
+log_file="$log_dir/$(date '+%Y-%m-%d').log"
+timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
 echo "[$timestamp] TOOL: $tool_name | FILE: $file_path | PROJECT: $project_dir" >> "$log_file"
 
-# Provide user feedback
-echo "📝 Logged: $tool_name operation"
+# Cleanup
+rm -f "$temp_file"
+
+# User feedback (to stderr so it doesn't interfere with hook output)
+echo "📝 Logged: $tool_name" >&2
 
 exit 0
 EOF
 
 chmod +x ~/.claude/scripts/activity-logger.sh
 ```
+
+**Prerequisites:**
+
+- Ensure `jq` is installed (for JSON parsing): `where jq` on Windows or `which jq` on Linux/Mac
+- If not installed: `choco install jq` (Windows) or `brew install jq` (Mac) or `apt-get install jq` (Linux)
+
+**Configuration:**
 
 ```bash
 claude
@@ -260,12 +282,62 @@ claude
     1. + Add new hook…
         ~/.claude/scripts/activity-logger.sh
     3. User settings             Saved in at ~/.claude/settings.json
+```
 
-Update this hook to settings.local.json
-Refer to the README-8Hooks.md in section Hooks - Activity Logger.  The log was not written to the ~/.claude/logs folder.  Fix it.   
+Or manually add to `.claude/settings.local.json`:
 
-quit
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/activity-logger.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
+**Important: Restart Claude Code** after adding or modifying hooks for changes to take effect.
+
+**Verify the Hook is Working:**
+
+```bash
+# Check today's activity log
+cat ~/.claude/logs/$(date '+%Y-%m-%d').log
+
+# Should show entries like:
+# [2026-01-15 19:42:33] TOOL: Read | FILE: demo/hooks/demo.ts | PROJECT: D:/development/ClaudeCodeLearning/ClaudeMastery
+# [2026-01-15 19:48:48] TOOL: Write | FILE: test.py | PROJECT: /home/user/project
+```
+
+**Troubleshooting:**
+
+1. **Hook errors appear in UI** - If you see "PreToolUse:Read hook error", check:
+   - Is `jq` installed? (`where jq` or `which jq`)
+   - Is the script executable? (`chmod +x ~/.claude/scripts/activity-logger.sh`)
+   - Does the script have correct permissions?
+
+2. **No logs are created** - Verify:
+   - The logs directory exists: `ls -la ~/.claude/logs/`
+   - The hook is configured correctly in settings
+   - You've restarted Claude Code after configuration changes
+
+3. **Hook output** - You should see "📝 Logged: [tool_name] operation" feedback when hooks execute
+
+**Test the Hook:**
+
+```bash
 claude
-Please add a console.log to demo.ts that prints "Testing activity logger"
+# Any operation will trigger the hook
+Add a console.log to demo.ts that prints "Testing activity logger"
+
+# Then check the logs
+cat ~/.claude/logs/$(date '+%Y-%m-%d').log
 ```

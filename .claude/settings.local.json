@@ -46,7 +46,9 @@
       "Bash(npm install:*)",
       "Bash(prettier --write:*)",
       "Bash(~/.claude/logs/test.log)",
-      "Bash(~/.claude/scripts/activity-logger.sh)"
+      "Bash(~/.claude/scripts/activity-logger.sh)",
+      "Bash(bash:*)",
+      "Bash(echo:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
