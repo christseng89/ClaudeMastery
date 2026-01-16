@@ -469,3 +469,172 @@ claude
 delete demo directory
 
 ```
+
+## Hooks - Sequence - Format File, Check Linting Errors, Git Stage
+
+```md
+User: "Add comment to app.ts"
+  ↓
+Claude: Edits file (adds comment)
+  ↓
+**PostToolUse** Hook Chain:
+  ↓
+1. 01-format.sh
+   ├─ Runs Prettier
+   └─ Outputs: ✨ Formatted
+  ↓
+2. 02-lint.sh
+   ├─ Runs ESLint
+   └─ Outputs: ✅ Lint passed
+  ↓
+3. 03-git-stage.sh
+   ├─ Runs git add
+   └─ Outputs: 📦 Git staged
+```
+
+```bash
+cat << 'EOF' > ~/.claude/scripts/01-format.sh
+#!/bin/bash
+# Format with Prettier
+
+input_json=$(cat)
+file_path=$(echo "$input_json" | jq -r '.tool_input.file_path // empty')
+
+# Only format TypeScript files
+if [[ "$file_path" =~ \.(js|jsx|ts|tsx)$ ]] && [[ -f "$file_path" ]]; then
+    if command -v prettier &> /dev/null; then
+        prettier --write "$file_path" 2>/dev/null
+        echo "1️⃣ ✨ Formatted: $(basename "$file_path")"
+    fi
+fi
+
+exit 0
+EOF
+
+chmod +x ~/.claude/scripts/01-format.sh
+file ~/.claude/scripts/01-format.sh
+
+cat << 'EOF' > ~/.claude/scripts/02-lint.sh
+#!/bin/bash
+# Lint with ESLint
+
+input_json=$(cat)
+file_path=$(echo "$input_json" | jq -r '.tool_input.file_path // empty')
+
+# Only lint TypeScript files
+if [[ "$file_path" =~ \.(js|jsx|ts|tsx)$ ]] && [[ -f "$file_path" ]]; then
+    if command -v eslint &> /dev/null; then
+        # Non-blocking: show warnings but continue
+        if eslint "$file_path" 2>/dev/null; then
+            echo "2️⃣ ✅ Lint passed: $(basename "$file_path")"
+            exit 0
+        else
+            echo "2️⃣ ⚠️  Lint warnings: $(basename "$file_path")"
+            exit 2
+        fi
+    fi
+fi
+
+exit 0  
+EOF
+
+chmod +x ~/.claude/scripts/02-lint.sh
+file ~/.claude/scripts/02-lint.sh
+
+cat << 'EOF' > ~/.claude/scripts/03-git-stage.sh
+#!/bin/bash
+# Auto-stage in Git
+
+input_json=$(cat)
+file_path=$(echo "$input_json" | jq -r '.tool_input.file_path // empty')
+
+# Check if file exists
+if [[ ! -f "$file_path" ]]; then
+    exit 0
+fi
+
+# Find the git repo for this specific file (handles nested repos)
+file_dir=$(dirname "$file_path")
+git_root=$(git -C "$file_dir" rev-parse --show-toplevel 2>/dev/null)
+
+if [[ -n "$git_root" ]]; then
+    # Get absolute path of file
+    abs_file_path=$(cd "$file_dir" && pwd)/$(basename "$file_path")
+    
+    # Get relative path from git root
+    rel_path=$(realpath --relative-to="$git_root" "$abs_file_path" 2>/dev/null || echo "$file_path")
+    
+    # Stage the file in its git repo
+    (cd "$git_root" && git add "$rel_path" 2>/dev/null)
+    status=$(cd "$git_root" && git status --short "$rel_path" 2>/dev/null)
+    
+    echo "3️⃣ 📋 Git staged: $(basename "$file_path")"
+    if [[ -n "$status" ]]; then
+        echo "   Status: $status"
+    fi
+fi
+
+exit 0
+EOF
+
+chmod +x ~/.claude/scripts/03-git-stage.sh
+file ~/.claude/scripts/03-git-stage.sh
+
+cat << 'EOF' > ~/.claude/settings.json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/01-format.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/02-lint.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/03-git-stage.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/safeguard-execution.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
+
+cat << 'EOF' > demo/hooks/app.js
+// This is a test file
+var x = 5; var x = 10; // duplicate variable declaration
+const y = 20; let z = 30;
+
+function testFunction() { console.log(x)
+  if(x==5){var unused = 'never used'; return true} else {return false;}
+}
+
+const arrow = (a,b) => {return a+b}; // More linting issues
+var duplicate = 1; var duplicate = 2; // Testing hook chain
+const test = "hook test"; var anotherVar = "testing linting"; eval('console.log("dangerous")'); debugger;for(var i=0;i<10;i++){setTimeout(function(){console.log(i)},100)}
+
+EOF
+```
+
+```bash
+claude
+Add a comment at the beginning of app.js explaining the purpose of this file
+
+```
