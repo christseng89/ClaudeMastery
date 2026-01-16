@@ -68,6 +68,13 @@ When creating new commands or agents, follow the existing frontmatter patterns w
    - Location: `~/.claude/logs/YYYY-MM-DD.log`
    - Includes JSON parsing with jq and fallback handling
 
+3. **Hook Chain Example** (01-format.sh → 02-lint.sh → 03-git-stage.sh)
+   - Demonstrates sequential hook execution for complete workflow automation
+   - **01-format.sh**: Formats code with Prettier
+   - **02-lint.sh**: Runs ESLint for code quality checks (non-blocking warnings)
+   - **03-git-stage.sh**: Automatically stages formatted files in git
+   - Test file: `demo/hooks/app.js` (intentionally contains linting issues for testing)
+
 **Configuration:** Hooks are configured in `.claude/settings.local.json`:
 
 ```json
@@ -103,7 +110,15 @@ When creating new commands or agents, follow the existing frontmatter patterns w
 - Log to dedicated directories with appropriate permissions
 - Restart Claude Code after modifying hook configuration
 
-For comprehensive hook documentation, patterns, and examples, see **README-8Hooks.md**.
+**Hook Chain Pattern:**
+Sequential hook execution enables complete workflow automation. The repository demonstrates a practical example:
+1. Format code with Prettier (01-format.sh)
+2. Check code quality with ESLint (02-lint.sh)
+3. Auto-stage changes in git (03-git-stage.sh)
+
+This pattern ensures code is formatted, validated, and ready to commit in a single automated flow.
+
+For comprehensive hook documentation, patterns, and examples including hook chain setup, see **README-8Hooks.md**.
 
 ### Example Project: expense-tracker
 
@@ -352,6 +367,7 @@ Follow this style: start with action verb (Add, Fix, Update, Refactor), be speci
 - **CLAUDE.md** - This file (project guidance)
 - **.claude/** - Claude Code configuration
 - **expense-tracker/** - Working example project
+- **demo/hooks/** - Hook testing examples and demonstrations
 - **Resources/** - Supplementary learning materials
 - **Travel Examples/** - Real-world application demonstrations
 
@@ -379,6 +395,24 @@ Follow this style: start with action verb (Add, Fix, Update, Refactor), be speci
 
 **Project-Specific Commands:**
 The expense-tracker also has `.claude/commands/` for domain-specific workflows.
+
+### Demo Directory Structure
+
+```
+demo/
+└── hooks/
+    └── app.js              # Test file with intentional code quality issues
+```
+
+**demo/hooks/** - Hook testing and demonstration files:
+- **app.js** - JavaScript test file intentionally written with various code quality issues to demonstrate hook functionality:
+  - Duplicate variable declarations
+  - Unused variables
+  - Poor formatting and missing semicolons
+  - Use of eval() and debugger statements
+  - Common closure pitfalls with setTimeout and var
+
+This file serves as a practical example for testing hook chains (format → lint → git stage) and demonstrating automated workflow capabilities.
 
 ### Tool Permissions
 
@@ -506,6 +540,8 @@ Memory guidance applies when working in this repository - follow the camelCase c
 Based on recent commits, the project is currently focused on:
 
 1. **Hooks system** - Automated workflows with PreToolUse/PostToolUse hooks for formatting, logging, and validation
+   - Hook chain patterns (format → lint → git stage)
+   - Test files and practical demonstrations (demo/hooks/)
 2. **Advanced workflow patterns** - Multi-agent systems with slash commands
 3. **Security hardening** - Fixing vulnerabilities in expense tracker API
 4. **Development mode configuration** - Proper environment setup

@@ -637,4 +637,5 @@ EOF
 claude
 Add a comment at the beginning of app.js explaining the purpose of this file
 
+/clear
 ```
