@@ -221,7 +221,6 @@ export default UserManager;
 EOF
 ```
 
-
 ```bash
 claude
 /auto-commit
