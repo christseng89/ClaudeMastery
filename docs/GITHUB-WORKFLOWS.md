@@ -91,8 +91,8 @@ permissions:
 **IMPORTANT**: Due to security restrictions, workflow files in `.github/workflows/` cannot be modified by Claude Code directly. You must manually update them.
 
 1. Review the fixed workflow files:
-   - `.github/workflows/claude.yml.fixed`
-   - `.github/workflows/claude-code-review.yml.fixed`
+   - `docs/workflow-fixes/claude.yml`
+   - `docs/workflow-fixes/claude-code-review.yml`
 
 2. Manually copy the contents to the actual workflow files:
    ```bash
@@ -101,8 +101,8 @@ permissions:
    cp .github/workflows/claude-code-review.yml .github/workflows/claude-code-review.yml.backup
 
    # Apply fixes
-   cp .github/workflows/claude.yml.fixed .github/workflows/claude.yml
-   cp .github/workflows/claude-code-review.yml.fixed .github/workflows/claude-code-review.yml
+   cp docs/workflow-fixes/claude.yml .github/workflows/claude.yml
+   cp docs/workflow-fixes/claude-code-review.yml .github/workflows/claude-code-review.yml
 
    # Commit changes
    git add .github/workflows/
@@ -419,7 +419,7 @@ prompt: |
 - Updated fetch-depth for full git history
 - Added comprehensive review prompt for automated reviews
 - Created this documentation file
-- Added `.fixed` versions of workflow files
+- Added corrected workflow files in `docs/workflow-fixes/`
 - Documented testing procedures and troubleshooting
 
 ### Previous Version (Before Fix)
