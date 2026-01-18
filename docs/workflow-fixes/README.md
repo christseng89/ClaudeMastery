@@ -23,6 +23,16 @@ Fixed version of `.github/workflows/claude-code-review.yml` with:
 - ✅ Removed outdated plugin configuration
 - ✅ Added comprehensive review prompt following CLAUDE.md guidelines
 
+### bug-fix.yml
+
+Fixed version of `.github/workflows/bug-fix.yml` with:
+- ✅ Correct authentication (`anthropic_api_key` instead of `claude_code_oauth_token`)
+- ✅ Removed unsupported `track_progress` parameter
+- ✅ Updated to `actions/checkout@v4` for consistency
+- ✅ Added CLAUDE.md reference to prompt
+- ✅ Enhanced prompt with test execution steps
+- ✅ Added pytest and python to allowed tools
+
 ## How to Apply These Fixes
 
 ### Option 1: Manual Copy (Recommended)
@@ -34,10 +44,12 @@ cd /path/to/ClaudeMastery
 # Backup current workflows
 cp .github/workflows/claude.yml .github/workflows/claude.yml.backup
 cp .github/workflows/claude-code-review.yml .github/workflows/claude-code-review.yml.backup
+cp .github/workflows/bug-fix.yml .github/workflows/bug-fix.yml.backup
 
 # Apply fixes
 cp docs/workflow-fixes/claude.yml .github/workflows/claude.yml
 cp docs/workflow-fixes/claude-code-review.yml .github/workflows/claude-code-review.yml
+cp docs/workflow-fixes/bug-fix.yml .github/workflows/bug-fix.yml
 
 # Review changes
 git diff .github/workflows/
