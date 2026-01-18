@@ -1,0 +1,64 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+    # Optional: Only run on specific file changes
+    # paths:
+    #   - "src/**/*.ts"
+    #   - "src/**/*.tsx"
+    #   - "src/**/*.js"
+    #   - "src/**/*.jsx"
+    #   - "expense-tracker/**/*.py"
+
+jobs:
+  claude-review:
+    # Optional: Filter by PR author or association
+    # if: |
+    #   github.event.pull_request.user.login == 'external-contributor' ||
+    #   github.event.pull_request.user.login == 'new-developer' ||
+    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # Changed from read - allows Claude to create commits if needed
+      pull-requests: write   # Changed from read - allows Claude to comment on PRs
+      issues: write          # Changed from read - allows Claude to comment on linked issues
+      id-token: write
+      actions: read          # Allows Claude to read CI/CD results
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Changed from 1 - provides full git history for better context
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          # Provide a specific prompt for automated code review
+          prompt: |
+            Review this pull request for:
+            1. Code quality and best practices
+            2. Security vulnerabilities (especially for Python FastAPI code)
+            3. Performance issues
+            4. Maintainability and readability
+            5. Test coverage
+            6. Documentation completeness
+
+            Focus on the expense-tracker application if changes are in that directory.
+            Follow the repository's CLAUDE.md guidelines, particularly:
+            - Python naming conventions (camelCase for internal, snake_case for API contracts)
+            - Security patterns for JWT authentication
+            - Testing conventions
+
+            Provide specific, actionable feedback with file paths and line numbers.
+
+          # Optional: Customize Claude's behavior
+          # claude_args: '--allowed-tools Read,Grep,Glob'
+
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+          # for available options
