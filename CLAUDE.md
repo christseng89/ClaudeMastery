@@ -120,6 +120,27 @@ This pattern ensures code is formatted, validated, and ready to commit in a sing
 
 For comprehensive hook documentation, patterns, and examples including hook chain setup, see **README-8Hooks.md**.
 
+### GitHub Workflows
+
+**GitHub Actions workflows** enable automated Claude Code integration for issues and pull requests:
+
+**Workflows** (`.github/workflows/`):
+- `claude.yml` - Interactive mode responding to `@claude` mentions in issues/PRs
+- `claude-code-review.yml` - Automated PR reviews on PR creation/updates
+
+**Key Configuration Requirements**:
+- **Permissions**: `contents: write`, `pull-requests: write`, `issues: write` (not just read)
+- **Secrets**: `ANTHROPIC_API_KEY` configured in repository settings
+- **Git History**: `fetch-depth: 0` for full repository context
+- **CI Access**: `actions: read` to analyze test results and workflow failures
+
+**Common Issues**:
+- Missing write permissions prevent Claude from commenting
+- Outdated plugin configurations cause workflow failures
+- Shallow git history limits Claude's context
+
+For comprehensive workflow documentation, testing procedures, and troubleshooting, see **docs/GITHUB-WORKFLOWS.md**.
+
 ### Example Project: expense-tracker
 
 The `expense-tracker/` directory contains a production-grade dual-implementation example:
@@ -366,6 +387,8 @@ Follow this style: start with action verb (Add, Fix, Update, Refactor), be speci
 - **README-*.md** - Numbered learning progression (1.1, 1.2, 2, 3, 4, 5, 6, 8)
 - **CLAUDE.md** - This file (project guidance)
 - **.claude/** - Claude Code configuration
+- **.github/workflows/** - GitHub Actions workflows for Claude Code integration
+- **docs/** - Additional documentation (workflows, testing, guides)
 - **expense-tracker/** - Working example project
 - **demo/hooks/** - Hook testing examples and demonstrations
 - **Resources/** - Supplementary learning materials
