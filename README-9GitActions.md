@@ -127,7 +127,7 @@ git pull
 
 ```bash
 cat << 'EOF' > .github/workflows/bug-fix.yml
-# 在 GitHub 仓库中给一个问题（Issue）打上“bug”标签时，
+# 在 GitHub 仓库中给一个问题（Issue）打上"bug"标签时，
 # 会自动启动 Claude AI 来分析代码、修复错误并提交代码拉取请求（PR）。
 name: Claude Bug Fix Automation
 
@@ -144,40 +144,45 @@ jobs:
       contents: write # To create branches and commits
       pull-requests: write # To create PRs
       issues: write # To comment on issues
-      id-token: write #
-      actions: read #
+      id-token: write
+      actions: read
 
     timeout-minutes: 10
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Run Claude to fix the bug
         uses: anthropics/claude-code-action@v1
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          track_progress: true
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
             REPO: ${{ github.repository }}
             ISSUE NUMBER: ${{ github.event.issue.number }}
 
-            Your task is to automatically fix the bug described in the issue above:
+            Your task is to automatically fix the bug described in the issue above.
 
+            IMPORTANT: Follow the repository conventions defined in CLAUDE.md, including:
+            - Python naming conventions (camelCase for internal, snake_case for API contracts)
+            - Security best practices
+            - Testing requirements
+
+            Steps:
             1. Read and analyze the issue to understand what needs to be fixed
-            2. Locate and read the affected files
-            3. Fix ALL bugs and security issues you identify
-            4. Create a new branch for your fixes using git
-            5. Commit your changes with a clear commit message
-            6. Push the branch to origin
-            7. Create a pull request using `gh pr create` with your Bash tool
-            8. Comment on the original issue with the PR link using `gh issue comment`
+            2. Read CLAUDE.md for repository-specific guidelines
+            3. Locate and read the affected files
+            4. Fix ALL bugs and security issues you identify
+            5. Run any relevant tests to verify the fix
+            6. Commit your changes with a clear commit message following the repo style
+            7. Create a pull request with a detailed description
+            8. Comment on the original issue with a summary and PR link
           claude_args: |
             --model claude-sonnet-4-5-20250929
             --max-turns 10
-            --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(npm:*),Bash(npx:*),Bash(gh:*)"
+            --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(npm:*),Bash(npx:*),Bash(gh:*),Bash(pytest:*),Bash(python:*)"
 EOF
 ```
 
@@ -226,3 +231,22 @@ claude
 /auto-commit
 /clear
 ```
+
+```bash
+git push
+
+gh issue create \
+  --title "Fix bugs in userManager.ts" \
+  --body "The file \`demo/hooks/userManager.ts\` has multiple security and other logical issues. \
+\
+Please fix all security, syntax and logical errors." \
+  --label "bug"
+```
+
+```response
+Creating issue in christseng89/ClaudeMastery
+
+https://github.com/christseng89/ClaudeMastery/issues/6
+```
+
+<https://github.com/christseng89/ClaudeMastery/issues/6>
