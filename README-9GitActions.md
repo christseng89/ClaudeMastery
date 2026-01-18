@@ -122,3 +122,68 @@ claude
 ```bash
 git pull
 ```
+
+## Claude Code - Pull Request Workflow Explanation
+
+```bash
+cat << 'EOF' > .github/workflows/bug-fix.yml
+# 在 GitHub 仓库中给一个问题（Issue）打上“bug”标签时，
+# 会自动启动 Claude AI 来分析代码、修复错误并提交代码拉取请求（PR）。
+name: Claude Bug Fix Automation
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  auto-fix-bug:
+    # Only run when issue is labeled with 'bug'
+    if: github.event.label.name == 'bug'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # To create branches and commits
+      pull-requests: write # To create PRs
+      issues: write # To comment on issues
+      id-token: write #
+      actions: read #
+
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude to fix the bug
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            ISSUE NUMBER: ${{ github.event.issue.number }}
+
+            Your task is to automatically fix the bug described in the issue above:
+
+            1. Read and analyze the issue to understand what needs to be fixed
+            2. Locate and read the affected files
+            3. Fix ALL bugs and security issues you identify
+            4. Create a new branch for your fixes using git
+            5. Commit your changes with a clear commit message
+            6. Push the branch to origin
+            7. Create a pull request using `gh pr create` with your Bash tool
+            8. Comment on the original issue with the PR link using `gh issue comment`
+          claude_args: |
+            --model claude-sonnet-4-5-20250929
+            --max-turns 10
+            --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(npm:*),Bash(npx:*),Bash(gh:*)"
+EOF
+```
+
+```bash
+claude
+/auto-commit
+/clear
+```
+

@@ -3,3 +3,4 @@ nul
 tmpclaude-*
 .mcp.json.backup
 .env
+*.mp4
