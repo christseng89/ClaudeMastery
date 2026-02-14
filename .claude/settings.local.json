@@ -55,6 +55,10 @@
   "enabledMcpjsonServers": [
     "MCP US Weather Server - node"
   ],
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); echo \"$input\" | jq -r '.model.display_name'"
+  },
   "hooks": {
     "PreToolUse": [
       {
