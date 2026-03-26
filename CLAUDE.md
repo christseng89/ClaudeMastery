@@ -18,8 +18,11 @@ The root-level README files follow a numbered learning progression:
 4. **README-3SubAgents.md** - Subagent architecture patterns
 5. **README-4ApiDeveloperAgent.md** - API reviewer agent example
 6. **README-5WorkflowWSubagentAndSlashCommand.md** - Advanced multi-agent workflows
-7. **README-6Context.md** - Context and memory management
-8. **README-8Hooks.md** - Hooks system and automation patterns
+7. **README-6ClaudeMemoryHandsOn.md** - Context and memory management
+8. **README-7MCP.md** - MCP (Model Context Protocol) server integration
+9. **README-8Hooks.md** - Hooks system and automation patterns
+10. **README-9GitActions.md** - GitHub Actions workflows for Claude Code
+11. **README-ASkills.md** - Skills system and custom skill creation
 
 Read these in order for proper context when creating new learning materials.
 
@@ -384,15 +387,18 @@ Follow this style: start with action verb (Add, Fix, Update, Refactor), be speci
 ## File Organization Logic
 
 ### Root Level
-- **README-*.md** - Numbered learning progression (1.1, 1.2, 2, 3, 4, 5, 6, 8)
+- **README-*.md** - Numbered learning progression (1.1, 1.2, 2, 3, 4, 5, 6, 7, 8, 9, A)
 - **CLAUDE.md** - This file (project guidance)
 - **.claude/** - Claude Code configuration
 - **.github/workflows/** - GitHub Actions workflows for Claude Code integration
 - **docs/** - Additional documentation (workflows, testing, guides)
-- **expense-tracker/** - Working example project
+- **expense-tracker/** - Working example project (CLI + FastAPI dual implementation)
 - **demo/hooks/** - Hook testing examples and demonstrations
 - **Resources/** - Supplementary learning materials
-- **Travel Examples/** - Real-world application demonstrations
+- **Skills/** - Custom skill definitions (e.g., `trade-finance/`)
+- **crash-course/** - Branch-based Claude Code crash course (each `project/*` branch = one topic)
+- **claude-code-crash-course/** - Extended crash course with advanced topics (MCP, context engineering, subagents, output styles, deep agents)
+- **IceBreaker/** - LangChain/Python application example (ice_breaker.py)
 
 ### .claude Directory Structure
 
@@ -561,20 +567,6 @@ The **Resources/** directory contains guides on Claude Code's memory system:
 
 Memory guidance applies when working in this repository - follow the camelCase convention established in session context.
 
-## Recent Development Focus
-
-Based on recent commits, the project is currently focused on:
-
-1. **Hooks system** - Automated workflows with PreToolUse/PostToolUse hooks for formatting, logging, and validation
-   - Hook chain patterns (format → lint → git stage)
-   - Test files and practical demonstrations (demo/hooks/)
-2. **Advanced workflow patterns** - Multi-agent systems with slash commands
-3. **Security hardening** - Fixing vulnerabilities in expense tracker API
-4. **Development mode configuration** - Proper environment setup
-5. **Documentation** - Comprehensive guides and examples
-
-When contributing, align with these themes and maintain the educational focus.
-
 ## MCP Server Integration
 
 The repository includes MCP (Model Context Protocol) server configuration in `.mcp.json`:
@@ -683,7 +675,7 @@ When adding new MCP servers, update `.mcp.json` and document their tools in this
 
 This repository demonstrates:
 
-1. **Progressive Learning** - From basics (README-1.x) to advanced patterns (README-5)
+1. **Progressive Learning** - From basics (README-1.x) to advanced patterns (README-A)
 2. **Practical Examples** - Working code (expense-tracker) not just theory
 3. **Extensibility** - Custom agents and commands show Claude Code's flexibility
 4. **Best Practices** - Security, testing, documentation, architecture patterns
