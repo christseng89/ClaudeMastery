@@ -22,7 +22,8 @@ The root-level README files follow a numbered learning progression:
 8. **README-7MCP.md** - MCP (Model Context Protocol) server integration
 9. **README-8Hooks.md** - Hooks system and automation patterns
 10. **README-9GitActions.md** - GitHub Actions workflows for Claude Code
-11. **README-ASkills.md** - Skills system and custom skill creation
+11. **README-A0Skills.md** / **README-A1HowToUseSkill.md** - Skills system and custom skill creation
+12. **README-BCowork.md** - Claude Cowork workflows and prompt templates
 
 Read these in order for proper context when creating new learning materials.
 
@@ -387,7 +388,7 @@ Follow this style: start with action verb (Add, Fix, Update, Refactor), be speci
 ## File Organization Logic
 
 ### Root Level
-- **README-*.md** - Numbered learning progression (1.1, 1.2, 2, 3, 4, 5, 6, 7, 8, 9, A)
+- **README-*.md** - Numbered learning progression (1.1, 1.2, 2–9, A0, A1, B)
 - **CLAUDE.md** - This file (project guidance)
 - **.claude/** - Claude Code configuration
 - **.github/workflows/** - GitHub Actions workflows for Claude Code integration
@@ -395,7 +396,8 @@ Follow this style: start with action verb (Add, Fix, Update, Refactor), be speci
 - **expense-tracker/** - Working example project (CLI + FastAPI dual implementation)
 - **demo/hooks/** - Hook testing examples and demonstrations
 - **Resources/** - Supplementary learning materials
-- **Skills/** - Custom skill definitions (e.g., `trade-finance/`)
+- **Skills/** - Custom skill definitions: `trade-finance/` (UCP 600 L/C review), `fix-terminal/` (Windows Terminal settings repair), `fix-wsl/` (WSL service PowerShell fix)
+- **Claude Masterclass Materials/** - Course slides, demo files, and prompt libraries for 8 training modules (Cowork, Chat, Excel, PowerPoint, Code Foundations, Building Apps, Building Agents)
 - **crash-course/** - Branch-based Claude Code crash course (each `project/*` branch = one topic)
 - **claude-code-crash-course/** - Extended crash course with advanced topics (MCP, context engineering, subagents, output styles, deep agents)
 - **IceBreaker/** - LangChain/Python application example (ice_breaker.py)
@@ -595,72 +597,24 @@ The repository includes MCP (Model Context Protocol) server configuration in `.m
      - Form submission and workflow automation
      - Dynamic content rendering and capture
 
-3. **Sequential Thinking MCP Server** - Provides structured, step-by-step reasoning capabilities
+3. **Sequential Thinking MCP Server** - Structured, step-by-step reasoning
    - **Configuration**: `npx -y @modelcontextprotocol/server-sequential-thinking`
-   - **Tool:** `sequential_thinking` - Facilitates detailed thinking process for problem-solving
-   - **Capabilities:**
-     - Break complex problems into manageable steps
-     - Revise and refine thoughts as understanding deepens
-     - Branch into alternative reasoning paths
-     - Track thought progression with indexing
-     - Support iterative refinement and hypothesis validation
-   - **Parameters:**
-     - `thought` (string) - Current thinking step content
-     - `nextThoughtNeeded` (boolean) - Whether another step is needed
-     - `thoughtNumber` (integer) - Current thought index
-     - `totalThoughts` (integer) - Estimated total steps needed
-     - `isRevision` (boolean) - Marks thought as revision
-     - `revisesThought` (integer) - Which thought is being revised
-     - `branchFromThought` (integer) - Branching point for alternative paths
-     - `branchId` (string) - Identifier for reasoning branch
-   - **Common Use Cases:**
-     - Complex problem decomposition and analysis
-     - Planning with room for course correction
-     - Exploratory reasoning with multiple approaches
-     - Maintaining context over multi-step reasoning
-     - Debugging and root cause analysis
-   - **Optional Configuration:**
-     - `DISABLE_THOUGHT_LOGGING=true` - Disable logging of thought information
+   - **Tool:** `sequential_thinking` — break complex problems into revisable, branchable thought steps
+   - **Optional Configuration:** `DISABLE_THOUGHT_LOGGING=true` (already set in `.mcp.json`)
+
+4. **GitHub MCP Server** - Git operations via MCP
+   - **Configuration**: `dotenv run uvx mcp-server-git` (reads `.env` for credentials)
+   - **Tools:** `mcp__github__git_*` — status, diff, log, commit, branch, checkout, reset, show
 
 **Usage Examples:**
 ```python
-# Weather tools
-mcp__weather__get-forecast(latitude=40.7128, longitude=-74.0060)  # NYC forecast
-mcp__weather__get-alerts(state="NY")  # New York weather alerts
+# Weather
+mcp__weather__get-forecast(latitude=40.7128, longitude=-74.0060)
+mcp__weather__get-alerts(state="NY")
 
-# Puppeteer tools (exact tool names depend on server implementation)
-# Navigate to a page and take screenshot
-# Fill forms and click buttons
-# Extract data from rendered pages
-
-# Sequential thinking tool - structured problem-solving
-# Example: Breaking down a complex architectural decision
-sequential_thinking({
-    "thought": "Need to choose between monolithic vs microservices architecture",
-    "thoughtNumber": 1,
-    "totalThoughts": 5,
-    "nextThoughtNeeded": True
-})
-
-# Example: Revising a previous thought with new information
-sequential_thinking({
-    "thought": "Actually, given the team size of 3, microservices adds unnecessary complexity",
-    "thoughtNumber": 3,
-    "totalThoughts": 5,
-    "isRevision": True,
-    "revisesThought": 2,
-    "nextThoughtNeeded": True
-})
-
-# Example: Exploring an alternative approach
-sequential_thinking({
-    "thought": "Alternative: Start with modular monolith for easier refactoring later",
-    "thoughtNumber": 4,
-    "totalThoughts": 6,
-    "branchFromThought": 2,
-    "branchId": "alternative-architecture",
-    "nextThoughtNeeded": True
-})
+# GitHub git operations
+mcp__github__git_status(repo_path=".")
+mcp__github__git_diff(repo_path=".", target="HEAD")
 ```
 
 **Adding New MCP Servers:**
