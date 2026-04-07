@@ -142,4 +142,72 @@ Turn this task into a skill for the `` related instructions, since it could be r
 <https://skills.sh/jeremylongshore/claude-code-plugins-plus-skills/forecasting-time-series-data>
 <https://github.com/jeremylongshore/claude-code-plugins-plus-skills/blob/main/plugins/ai-ml/time-series-forecaster/skills/forecasting-time-series-data/SKILL.md>
 
-Customize -> Skills -> `+` Create skill -> Upload a Skill -> Click to Upload -> Select the `SKILL.md` from the forecasting-time-series-data skill
+Customize -> Skills -> `+` Create skill -> Upload a Skill -> Click to Upload -> Select the `SKILL.md` file (Copy and Paste from GitHub)
+
+Select folder `C:\Users\samfi\development\ClaudeCodeLearning\ClaudeMastery\Claude Masterclass Materials\Module 2 - Claude Cowork\Financial Forecasting`
+
+```cowork prompt
+using the financial forecasting skill, train an ARIMA model and SARIMA models using the `sales_forecasting.xlsx` to forecast the revenue. Test the model using the `future_calendar.xlsx`
+```
+
+✅ 一句話總結
+
+👉 這張圖的核心結論是： `ARIMA` 提供**穩定**可用的**預測**，而 `SARIMA` 在這組數據上設定不佳，導致**預測失真**。
+
+## Custom Financial Plugin
+
+Resources
+
+* Folder `C:\Users\samfi\OneDrive\Documents\Claude Masterclass Materials\Module 2 - Claude Cowork\Finance - Custom Plugin`
+* Plugin Instructions file: `Claude Plugin Creation - Finance Variance Analysis and Statements creationV3.docx`
+* Data file: `Variance analysis and statements financial dataset.xlsx`
+
+```cowork prompt
+- What is your role / position title? => Senior Financial Analyst
+- What is your primary accounting software? => Excel / Google Sheets
+- What output format do you prefer for reports? => Both Excel & Word
+- Who is the primary audience for your financial reports? => Board of Directors
+```
+
+Output
+
+* Plugin: `my-finance.plugin` -> Save Plugin
+* To install: open the .plugin file in Cowork and press the install button.
+
+```cowork prompt
+/my-finance:my-variance-analysis Monthly budget vs. actual expenses
+/my-financials-statements
+
+generate powerpoint slides to summarize the financial statements
+```
+
+## Practice Opportunity Question: Analyze data plugin
+
+Folder: `C:\Users\samfi\OneDrive\Documents\Claude Masterclass Materials\Module 2 - Claude Cowork\Data Analysis - Practice Opportunity`
+Data file: `reviews.xlsx`
+
+### 字段详情
+
+| 字段名 | 类型 | 分类 | 空值 | 唯一值数 | 备注 |
+|---|---|---|---|---|---|
+| `Rating` | 整数 | 指标 | 0 | 5个（1–5星） | 严重偏向5星 |
+| `Date` | 日期 | 时间 | 0 | 75 | 92%的数据来自2025年7月 |
+| `Variation` | 文本 | 维度 | 0 | 16 | 产品型号/颜色变体 |
+| `Verified_Reviews` | 文本 | 自由文本 | 1 | 2,300 | 用户评论正文 |
+| `Feedback` | 整数 | 布尔标志 | 0 | 2（0或1） | 1=正面，0=负面 |
+
+```cowork prompt
+/explore-data using the reviews.xlsx
+/validate-data
+/clean-data save as reviews_cleaned.xlsx
+/clean-data those duplicate records to one record in reviews_cleaned.xlsx
+
+/dashboard Create a single-page dashboard showing review volume and average sentiment.
+
+Using data-visualization skill to plot a Word Cloud to identify the most frequent customer by using reviews_cleaned.xlsx
+
+Generate a 3-slide PowerPoint summary
+
+/create-viz plot a bar chart showing the distribution of ratings (1–5 stars) in reviews_cleaned.xlsx
+
+```

@@ -5,7 +5,14 @@ description: >
   models. Use this skill when the user asks to predict future values of a time series,
   forecast sales, traffic, stock prices, or any other time-dependent metric, or when they
   want to analyze trends, seasonality, and confidence intervals in sequential data.
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash(cmd:*)
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
+license: MIT
+compatible-with: claude-code, codex, openclaw
 ---
+
+<!-- compatible-with: claude-code, codex, openclaw -->
 
 # Time Series Forecaster
 
