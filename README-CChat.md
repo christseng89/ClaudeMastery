@@ -1,5 +1,12 @@
 # Claude Chat
 
+## Measuring AI’s ability to complete long tasks
+
+<https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/>
+
+- Linear scale
+- 80% success
+
 ## Example
 
 ```prompt
@@ -140,7 +147,7 @@ You instruct the model to **reason step-by-step** before giving the final answer
 
 ---
 
-## 📌 Basic CoT Prompt
+## 3.1 📌 Basic CoT Prompt
 
 ```text
 A company has revenue of $1M, costs of $600K, and taxes of $100K.
@@ -150,7 +157,7 @@ Think step by step and calculate the net profit.
 
 ---
 
-## 📌 Structured CoT Prompt (Better)
+## 3.2 📌 Structured CoT Prompt (Better)
 
 ```text
 Analyze the following scenario step by step:
@@ -170,16 +177,17 @@ Final Answer:
 
 ---
 
-## 💡 ESG - Trade Finance / AI Architecture Example (Advanced)
+## 3.3 💡 ESG - Trade Finance / AI Architecture Example (Advanced)
 
 ```text
-A bank wants to implement ESG scoring into its trade finance system.
+You are a Trade Finance and SCF expert tasked with integrating a 3rd party ESG solution. A bank wants to implement ESG scoring into its Trade Finance and SCF system.
 
 Think step by step:
 1. Identify data sources (internal + external ESG APIs)
 2. Define how ESG score integrates into LC workflow
-3. Suggest architecture (microservices + API layer)
-4. Identify risks and compliance considerations
+3. Using a 3rd party ESG API integration, outline the scoring process
+4. Suggest architecture (microservices + API layer)
+5. Identify risks and compliance considerations
 
 Final Answer:
 Provide a structured solution.
@@ -187,7 +195,7 @@ Provide a structured solution.
 ```
 
 ```md
-# 🔥 Bonus: Chain-of-Thought + Few-shot (Best Practice)
+## 3.4 🔥 Bonus: Chain-of-Thought + Few-shot (Best Practice)
 
 👉 This is what top AI teams use
 
@@ -212,7 +220,7 @@ Step-by-step:
 ```
 
 ```md
-# 🚀 Quick Comparison
+## 3.5 🚀 Quick Comparison
 
 | Type             | Use Case                 | Strength      | Weakness        |
 | ---------------- | ------------------------ | ------------- | --------------- |
@@ -222,7 +230,7 @@ Step-by-step:
 
 ---
 
-# 🎯 Pro Tip (Based on your use cases)
+## 3.6 🎯 Pro Tip (Based on your use cases)
 
 For your **AI Agent / Banking / ESG / CBPR+ work**, best pattern is:
 
@@ -242,4 +250,109 @@ Output:
 2. Recommendation
 3. Risks
 ```text end
+```
+
+---
+
+## 🔬 Deep Research Mode in Claude
+
+```prompt
+Context:
+
+You are a Ph.D. researcher specializing in next-generation electric vehicle (EV) technologies. Your organization is seeking a comprehensive, forward-looking briefing on state-of-the-art battery innovations that are expected to significantly impact EV performance, charging speed, safety, and sustainability over the 2025–2030 horizon.
+
+Instruction:
+
+Conduct an in-depth review and synthesis of emerging EV battery technologies projected to reach technical or commercial maturity between 2025 and 2030. Your focus should include, but is not limited to, the following areas:
+
+    ● Solid-state batteries (including lithium metal and composite variants)
+    ● Next-generation electrolytes supporting ultra-fast charging
+    ● High-performance sodium-ion and sodium solid-state batteries
+    ● Battery-swapping technologies and evolving recycling ecosystems
+
+Include analysis of:
+
+    ● Key performance metrics (energy density, cycle life, charging speed, safety improvements)
+    ● Commercialization timelines and scalability
+    ● Notable industry players and research institutions driving development
+    ● Critical challenges and readiness levels (TRLs)
+
+Input:
+ This is a standalone task. No external input will be provided.
+
+Output:
+ Deliver a detailed briefing report that includes:
+
+    ● Technology name and associated company/institution
+    ● Breakthrough or innovation summary
+    ● Quantitative performance indicators (e.g., Wh/Kg, charge time, safety benchmarks)
+    ● Implementation timeline and current stage of commercialization
+
+The goal is to equip stakeholders with a clear understanding of transformative battery technologies shaping the EV landscape by 2030.
+```
+
+## Claude Chat for Creative Writing
+
+```text
+● Creative writing:
+    ● Write a professional e-mail to Richard Marino who is the owner of a famous Italian restaurant in Toronto, Canada, offering content creation services to his restaurant. Highlight my value in content creation and marketing.
+
+    ● Write a professional email to Richard Marino, who is the owner of a famous Italian restaurant in Toronto, Canada, offering content creation services to his restaurant. Highlight my value in improving their audience reach, mention 2 examples of content I can deliver, and end with a clear invitation to connect.
+
+    ● Turn this into a poem
+    ● Turn this into an Instagram post with hashtags
+```
+
+## Claude Chat for Brainstorming
+
+```text
+● Brainstorm ideas:
+    ● Imagine you are on Tesla’s innovation team in the year 2030. Brainstorm 5 futuristic features that could make riding in a fully autonomous Tesla not just convenient, but genuinely fun, immersive, and memorable for passengers.
+
+```
+
+## Develop Dashboards Using Claude Front End Design Skill
+
+```text
+● Data Analysis & Dashboard Visualization
+    ● Create 10 different data visualizations to highlight various aspects of the dataset. Include interactive charts. “Upload Cancer datasets”
+```
+
+```text
+● Information Extraction & Research Assistance:
+    ● What are the main revenue sources for Nvidia? “Attach Nvidia-10K-Report.pdf”
+    ● Convert it into PowerPoint 
+    ● Put the results in Excel
+```
+
+```text
+● Financial Data Analysis:
+    ● Analyze this company’s financial and identify potential liquidity risks. (attach “Financial_Statement.csv” file)
+```
+
+```text
+● Problem-Solving
+    ● Show a detailed step-by-step solution to this problem, and show the equations  “attach problem_solving.pdf”
+```
+
+```text
+● </>Code: Debugging
+
+    def add_numbers(num1, num2):
+        """Returns the sum of two numbers."""
+        return num1 + num2
+
+    # Usage:
+    result = add_numbers(5, 10
+    print(f"The sum is: {result}")
+
+
+● </>Code: Could you help me turn a screenshot into working code? (Airbnb)
+● </>write: create a newsletter or a podcast
+● </>learn: create a rubric 
+
+
+● Creative Image Generation (Try with Gemini for comparison):
+    ● Generate an epic panoramic illustration featuring the New Seven Wonders of the World together in one majestic landscape: the Great Wall of China winding across distant mountains, the rose-red cliffs of Petra with its carved Treasury, the towering Christ the Redeemer statue overlooking the scene, Machu Picchu perched high in the Andes with misty clouds, the pyramid of Chichen Itza rising in the foreground, the grand Roman Colosseum standing strong, and the glowing white Taj Mahal reflecting in a pool. The Great Pyramid of Giza is shown nearby under golden sunlight as an honorary wonder. The entire scene is unified in a dramatic, cinematic style with vibrant colors, warm light, and awe-inspiring scale.
+
 ```
