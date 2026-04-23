@@ -20,11 +20,11 @@ List of available skills
   - /make-it-pretty - Make It Pretty
   - /remove-comments - Remove Obvious Comments
   - /fix-imports - Fix Broken Imports
+  - /review - Code Review
+  - /security-review - Review code for security vulnerabilities
 
   Code Analysis & Review:
-  - /review - Code Review
   - /security-scan - Security Analysis
-  - /security-review - Review code for security vulnerabilities
   - /predict-issues - Predictive Code Analysis
   - /understand - Understand Project
 
@@ -33,6 +33,10 @@ List of available skills
   - /cleanproject - Clean Project
 
   Documentation:
+  # 透過 plugin marketplace 安裝 document-skills
+  /plugin marketplace add anthropics/skills
+  /plugin install document-skills@anthropics
+
   - /docs - Documentation Manager
   - /contributing - Complete Contribution Strategy (Context Aware)
   - /explain-like-senior - Senior Developer Explanation

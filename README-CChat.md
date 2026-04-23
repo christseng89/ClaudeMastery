@@ -311,6 +311,11 @@ The goal is to equip stakeholders with a clear understanding of transformative b
 
 ```
 
+Output:
+
+- EV_Battery_Briefing_EN.docx
+- EV_Battery_Briefing_CN.docx
+
 ## Develop Dashboards Using Claude Front End Design Skill
 
 ```text
@@ -318,16 +323,45 @@ The goal is to equip stakeholders with a clear understanding of transformative b
     ● Create 10 different data visualizations to highlight various aspects of the dataset. Include interactive charts. “Upload Cancer datasets”
 ```
 
+Input: cancer.csv
+
+Output: cancer_dashboard.html
+
+## Extract Nvidia Financial Data from PDF to Excel and PowerPoint
+
 ```text
 ● Information Extraction & Research Assistance:
     ● What are the main revenue sources for Nvidia? “Attach Nvidia-10K-Report.pdf”
-    ● Convert it into PowerPoint 
-    ● Put the results in Excel
+        ● Convert it into PowerPoint 
+        ● Put the results in Excel
+
+    ● Extract the balance sheet from the 10K document and summarize it in a tabular format.
+        ● Convert it into PowerPoint 
+        ● Put the results in Excel
 ```
+
+- Input: Nvidia-10K-Report.pdf
+
+## Financial Data Analysis and One Pager Summary Generation with PPTX Skills
 
 ```text
 ● Financial Data Analysis:
     ● Analyze this company’s financial and identify potential liquidity risks. (attach “Financial_Statement.csv” file)
+    ● 流动比率 营运资本 资产负债率 净利润率 公式是甚麼? 如何算出的?
+    ● Convert all the above mentioned into a Powerpoint
+```
+
+Input: Financial_Statement.csv
+Output: Financial_Statement_风险分析报告.pptx
+
+## Learn with Claude Chat
+
+```text
+嗨 Claude！你可以設計一些反思練習嗎？如果你需要我提供更多資訊，請先直接問我 1–2 個關鍵問題。如果你覺得我應該提供更多背景資訊請直接問我 1–2 個關鍵問題，然後再根據我的回答設計反思練習。
+```
+
+```text
+一個自己公司開發的參數驅動系統  (UI + JS + MS) 設參後交易測試時一堆BUGS，工作負擔過重。 如何使用AI來更有效的處理問題? 例如使用 Source code + 參數規格 等?
 ```
 
 ```text
@@ -335,7 +369,11 @@ The goal is to equip stakeholders with a clear understanding of transformative b
     ● Show a detailed step-by-step solution to this problem, and show the equations  “attach problem_solving.pdf”
 ```
 
+## Code with Claude Chat
+
 ```text
+Fix the bug in this code below and explain the issue. 
+
 ● </>Code: Debugging
 
     def add_numbers(num1, num2):
@@ -346,12 +384,20 @@ The goal is to equip stakeholders with a clear understanding of transformative b
     result = add_numbers(5, 10
     print(f"The sum is: {result}")
 
+```
 
-● </>Code: Could you help me turn a screenshot into working code? (Airbnb)
-● </>write: create a newsletter or a podcast
-● </>learn: create a rubric 
+```result
+# ✅ 完整修正後的程式碼
+def add_numbers(num1, num2):
+    """Returns the sum of two numbers."""
+    return num1 + num2
 
+# Usage:
+result = add_numbers(5, 10)  # ← 補上右括號
+print(f"The sum is: {result}")
+```
 
+```text
 ● Creative Image Generation (Try with Gemini for comparison):
     ● Generate an epic panoramic illustration featuring the New Seven Wonders of the World together in one majestic landscape: the Great Wall of China winding across distant mountains, the rose-red cliffs of Petra with its carved Treasury, the towering Christ the Redeemer statue overlooking the scene, Machu Picchu perched high in the Andes with misty clouds, the pyramid of Chichen Itza rising in the foreground, the grand Roman Colosseum standing strong, and the glowing white Taj Mahal reflecting in a pool. The Great Pyramid of Giza is shown nearby under golden sunlight as an honorary wonder. The entire scene is unified in a dramatic, cinematic style with vibrant colors, warm light, and awe-inspiring scale.
 
